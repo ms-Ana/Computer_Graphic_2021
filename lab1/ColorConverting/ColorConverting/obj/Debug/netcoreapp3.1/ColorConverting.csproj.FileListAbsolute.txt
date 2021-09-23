@@ -1,0 +1,15 @@
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\bin\Debug\netcoreapp3.1\ColorConverting.exe
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\bin\Debug\netcoreapp3.1\ColorConverting.deps.json
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\bin\Debug\netcoreapp3.1\ColorConverting.runtimeconfig.json
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\bin\Debug\netcoreapp3.1\ColorConverting.runtimeconfig.dev.json
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\bin\Debug\netcoreapp3.1\ColorConverting.dll
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\bin\Debug\netcoreapp3.1\ColorConverting.pdb
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\obj\Debug\netcoreapp3.1\ColorConverting.csprojAssemblyReference.cache
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\obj\Debug\netcoreapp3.1\ColorConverting.Form1.resources
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\obj\Debug\netcoreapp3.1\ColorConverting.csproj.GenerateResource.cache
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\obj\Debug\netcoreapp3.1\ColorConverting.AssemblyInfoInputs.cache
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\obj\Debug\netcoreapp3.1\ColorConverting.AssemblyInfo.cs
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\obj\Debug\netcoreapp3.1\ColorConverting.csproj.CoreCompileInputs.cache
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\obj\Debug\netcoreapp3.1\ColorConverting.dll
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\obj\Debug\netcoreapp3.1\ColorConverting.pdb
+D:\!!Универ\7 семестр\Компьютерная графика\ColorConverting\ColorConverting\obj\Debug\netcoreapp3.1\ColorConverting.genruntimeconfig.cache

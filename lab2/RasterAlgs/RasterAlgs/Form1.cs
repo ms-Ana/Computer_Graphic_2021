@@ -23,6 +23,7 @@ namespace RasterAlgs
         int currentAlg;
 
         HashSet<Point> filled;
+        List<Point> p;
         int startX, startY;
 
         public Form1()
@@ -32,9 +33,25 @@ namespace RasterAlgs
             g = this.CreateGraphics();
             newColor = Color.Red;
             buttonFillImage.Visible = false;
-            drawSlow = true;
+            drawSlow = false;
             filled = new HashSet<Point>();
+            p = new List<Point>();
             this.MouseClick += Form1_MouseClick;
+            buttonBorder.Visible = false;
+        }
+
+        void DrawBorderFromList()
+        {
+            int[] addX = { 0, -1, -1, -1, 0, 1, 1, 1 };
+            int[] addY = { 1, 1, 0, -1, -1, -1, 0, 1 };
+            foreach (Point point in p)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    currentImage.SetPixel(point.X + addX[i], point.Y + addY[i], Color.Black);
+                }
+            }
+            g.DrawImage(currentImage, 200, 50);
         }
 
         private void Form1_MouseClick(object sender, MouseEventArgs e)
@@ -56,7 +73,7 @@ namespace RasterAlgs
             else
             {
                 oldColor = currentImage.GetPixel(e.X - 200, e.Y - 50);
-                List<Point> points = FindBorderOfImage(e.X - 200, e.Y - 50);
+                FindBorderOfImage(e.X - 200, e.Y - 50);
                 g.DrawImage(currentImage, 200, 50);
             }
         }
@@ -119,7 +136,7 @@ namespace RasterAlgs
                 g.DrawImage(currentImage, 200, 50);
             }
 
-            for (int j = left + 1; j < right; j++)
+            for (int j = left; j <= right; j++)
             {
                 FillLines(j, y - 1);
             }
@@ -259,7 +276,7 @@ namespace RasterAlgs
                 g.DrawImage(currentImage, 200, 50);
             }
 
-            for (int j = left + 1; j < right; j++)
+            for (int j = left; j <= right; j++)
             {
                 FillLinesImage(j, y - 1);
             }
@@ -269,7 +286,7 @@ namespace RasterAlgs
             }
         }
 
-        private List<Point> FindBorderOfImage(int x, int y)
+        private void FindBorderOfImage(int x, int y)
         {
             int right = x;
             while (true)
@@ -289,11 +306,15 @@ namespace RasterAlgs
             List<Point> points = new List<Point>();
             points.Add(new Point(right, y));
             currentImage.SetPixel(right, y, Color.Black);
-            g.DrawImage(currentImage, 200, 50);
+            if (drawSlow)
+            {
+                g.DrawImage(currentImage, 200, 50);
+            }
             int currX = right; int currY = y;
             Color c; bool flag; bool endFlag = false;
             int[] addX = { 0, -1, -1, -1, 0, 1, 1, 1 };
             int[] addY = { 1, 1, 0, -1, -1, -1, 0, 1 };
+            int dir = 0;
             while (true)
             {
                 if (endFlag)
@@ -301,36 +322,47 @@ namespace RasterAlgs
                     break;
                 }
                 flag = false;
+                if (dir == -2)
+                {
+                    dir = 6;
+                }
+                else if (dir == -1)
+                {
+                    dir = 7;
+                }
                 for (int i = 0; i < 8; i++)
                 {
+                    dir %= 8;
                     if (endFlag)
                     {
                         break;
                     }
-                    if (points.Contains(new Point(currX + addX[i], currY + addY[i])))
+                    if (points.Contains(new Point(currX + addX[dir], currY + addY[dir])))
                     {
-                        if (currX + addX[i] == right && currY + addY[i] == y)
+                        if (currX + addX[dir] == right && currY + addY[dir] == y)
                         {
                             endFlag = true;
                         }
                         continue;
                     }
-                    c = currentImage.GetPixel(currX + addX[i], currY + addY[i]);
+                    c = currentImage.GetPixel(currX + addX[dir], currY + addY[dir]);
                     if (c.R != oldColor.R && c.G != oldColor.G && c.B != oldColor.B)
                     {
                         for (int j = 0; j < 7; j+= 2)
                         {
-                            c = currentImage.GetPixel(currX + addX[i] + addX[j], currY + addY[i] + addY[j]);
+                            c = currentImage.GetPixel(currX + addX[dir] + addX[j], currY + addY[dir] + addY[j]);
                             if (c.R == oldColor.R && c.G == oldColor.G && c.B == oldColor.B)
                             {
-                                currX += addX[i]; currY += addY[i];
+                                currX += addX[dir]; currY += addY[dir];
                                 points.Add(new Point(currX, currY));
                                 currentImage.SetPixel(currX, currY, Color.Black);
+                                points.Add(new Point(currX, currY));
                                 if (drawSlow)
                                 {
                                     g.DrawImage(currentImage, 200, 50);
                                 }
                                 flag = true;
+                                dir -= 2;
                                 break;
                             }
                         }
@@ -338,11 +370,12 @@ namespace RasterAlgs
                         {
                             break;
                         }
+                        dir++;
                     }
                 }
                 
             }
-            return points;
+            p.AddRange(points);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -357,16 +390,19 @@ namespace RasterAlgs
             {
                 buttonFillImage.Visible = false;
                 currentAlg = 0;
+                buttonBorder.Visible = false;
             }
             else if (cmb.SelectedIndex == 1)
             {
                 buttonFillImage.Visible = true;
                 currentAlg = 1;
+                buttonBorder.Visible = false;
             }
             else
             {
                 buttonFillImage.Visible = false;
                 currentAlg = 2;
+                buttonBorder.Visible = true;
             }
         }
 
@@ -379,6 +415,7 @@ namespace RasterAlgs
                 currentImage = new Bitmap(open.FileName);
                 originalImage = new Bitmap(open.FileName);
                 g.Clear(SystemColors.Control);
+                p.Clear();
                 g.DrawImage(currentImage, 200, 50);
 
             }
@@ -401,9 +438,15 @@ namespace RasterAlgs
             drawSlow = checkBox.Checked;
         }
 
+        private void buttonBorder_Click(object sender, EventArgs e)
+        {
+            DrawBorderFromList();
+        }
+
         private void buttonClear_Click(object sender, EventArgs e)
         {
             g.Clear(SystemColors.Control);
+            p.Clear();
             currentImage = new Bitmap(originalImage);
             g.DrawImage(currentImage, 200, 50);
         }

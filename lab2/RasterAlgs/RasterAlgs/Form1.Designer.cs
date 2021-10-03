@@ -34,6 +34,7 @@ namespace RasterAlgs
             this.buttonFillImage = new System.Windows.Forms.Button();
             this.buttonClear = new System.Windows.Forms.Button();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.buttonBorder = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // comboBox1
@@ -83,8 +84,6 @@ namespace RasterAlgs
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Checked = true;
-            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox1.Location = new System.Drawing.Point(13, 232);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(82, 17);
@@ -93,11 +92,22 @@ namespace RasterAlgs
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
+            // buttonBorder
+            // 
+            this.buttonBorder.Location = new System.Drawing.Point(13, 306);
+            this.buttonBorder.Name = "buttonBorder";
+            this.buttonBorder.Size = new System.Drawing.Size(120, 23);
+            this.buttonBorder.TabIndex = 5;
+            this.buttonBorder.Text = "Draw enlarged border";
+            this.buttonBorder.UseVisualStyleBackColor = true;
+            this.buttonBorder.Click += new System.EventHandler(this.buttonBorder_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.buttonBorder);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.buttonClear);
             this.Controls.Add(this.buttonFillImage);
@@ -118,6 +128,7 @@ namespace RasterAlgs
         private System.Windows.Forms.Button buttonFillImage;
         private System.Windows.Forms.Button buttonClear;
         private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.Button buttonBorder;
     }
 }
 

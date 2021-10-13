@@ -1,0 +1,4 @@
+LIBRARY "graphic"
+EXPORTS 
+point_location
+inside_polygon

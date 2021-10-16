@@ -8,8 +8,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Collections;
+using System.Runtime.InteropServices;
+using System.Numerics;
 
-namespace AffineTransformations
+namespace AffineTransformations 
 {
     public partial class Form1 : Form
     {
@@ -92,6 +94,7 @@ namespace AffineTransformations
         private void Form1_MouseSelectPoint(object sender, MouseEventArgs e)
         {
             rotationPoint = new Point(e.X - W, H - e.Y);
+            rotationAngle = 0;
             g.Clear(SystemColors.Control);
             DrawAxis();
             DrawFigure(currentFigure, Color.FromArgb(255, 20, 20, 20));
@@ -137,12 +140,140 @@ namespace AffineTransformations
             }
         }
 
+        int PointLocation(double p1_x, double p1_y, double p2_x, double p2_y, double p_x, double p_y)
+        {
+            double ax = p2_x - p1_x;
+            double ay = p2_y - p1_y;
+            double bx = p_x - p1_x;
+            double by = p_y - p1_y;
+            double loc = by * ax - bx * ay;
+            if (loc == 0 && (p_x <= p2_x && p_x >= p1_x || p_x <= p1_x && p_x >= p2_x))
+                return 2;
+            if (loc == 0)
+                return 0;
+            if (loc > 0)
+                return -1;
+            return 1;
+        }
+
+        bool InsidePolygon(double p_x, double p_y,
+            double[] points_x, double[] points_y, int size)
+        {
+            bool answer = false;
+            int j = size - 1;
+
+            for (int i = 0; i < size; i++)
+            {
+                if (PointLocation(points_x[i], points_y[i], points_x[j], points_y[j], p_x, p_y) == 2
+                    || PointLocation(points_x[j], points_y[j], points_x[i], points_y[i], p_x, p_y) == 2)
+                    return true;
+                if ((points_y[i] < p_y && points_y[j] >= p_y
+                    || points_y[i] >= p_y && points_y[j] < p_y)
+                    && (points_x[i] + (p_y - points_y[i]) /
+                        (points_y[j] - points_y[i]) * (points_x[j] - points_x[i]) < p_x))
+                {
+                    answer = !answer;
+                }
+                j = i;
+            }
+            return answer;
+        }
+
+        private void Form1_MouseClassifyPointLocation(object sender, MouseEventArgs e)
+        {
+            if (currentFigure.Count > 2)
+            {
+                return;
+            }
+            label1.Visible = false;
+            SolidBrush brush = new SolidBrush(Color.Red);
+            g.Clear(SystemColors.Control);
+            DrawAxis();
+            DrawFigure(currentFigure, Color.FromArgb(255, 20, 20, 20));
+            g.FillRectangle(brush, e.X - 1, e.Y - 1, 3, 3);
+
+            double[] first = (double[])currentFigure[0];
+            double[] second = (double[])currentFigure[1];
+            int location = PointLocation(first[0], first[1], second[0], second[1], e.X - W, H - e.Y);
+            if (location == 2)
+            {
+                label1.Visible = true;
+                label1.Text = "Точка лежит внутри отрезка";
+                return;
+            }
+            else if (location == 0)
+            {
+                label1.Visible = true;
+                label1.Text = "Точка лежит на той же прямой";
+                return;
+            }
+            else if (location == -1)
+            {
+                label1.Visible = true;
+                label1.Text = "Точка лежит слева";
+                return;
+            }
+            else
+            {
+                label1.Visible = true;
+                label1.Text = "Точка лежит справа";
+                return;
+            }
+        }
+
+        private void Form1_MousePointInsidePolygon(object sender, MouseEventArgs e)
+        {
+            label1.Visible = false;
+            SolidBrush brush = new SolidBrush(Color.Red);
+            g.Clear(SystemColors.Control);
+            DrawAxis();
+            DrawFigure(currentFigure, Color.FromArgb(255, 20, 20, 20));
+            g.FillRectangle(brush, e.X - 1, e.Y - 1, 3, 3);
+
+            double[] points_x = new double[currentFigure.Count];
+            double[] points_y = new double[currentFigure.Count];
+            for (int i = 0; i < currentFigure.Count; i++)
+            {
+                double[] curr = (double[])currentFigure[i];
+                points_x[i] = curr[0];
+                points_y[i] = curr[1];
+            }
+            bool inside = InsidePolygon(e.X - W, H - e.Y, points_x, points_y, currentFigure.Count);
+            if (inside)
+            {
+                label1.Visible = true;
+                label1.Text = "Точка лежит внутри многоугольника";
+                return;
+            }
+            else
+            {
+                label1.Visible = true;
+                label1.Text = "Точка не лежит внутри многоугольника";
+                return;
+            }
+        }
+
         private void buttonCurrent_Click(object sender, EventArgs e)
         {
             Button button = (Button)sender;
             if (button.Text == "Задать текущий примитив")
             {
                 currentFigure.Clear();
+                textBoxDx.Visible = false;
+                textBoxDx.Text = "";
+                textBoxDy.Visible = false;
+                textBoxDy.Text = "";
+                textBox1.Visible = false;
+                textBox1.Text = "";
+                textBox2.Visible = false;
+                textBox2.Text = "";
+                label1.Visible = false;
+                MouseClick -= Form1_MouseSelectPoint;
+                MouseWheel -= Form1_MouseWheelRotate;
+                MouseClick -= Form1_MouseSelectPointDilation;
+                MouseClick -= Form1_MouseFindIntersection;
+                MouseClick -= Form1_MouseClassifyPointLocation;
+                MouseClick -= Form1_MousePointInsidePolygon;
                 g.Clear(SystemColors.Control);
                 DrawAxis();
                 MouseClick += Form1_MouseClick;
@@ -353,6 +484,8 @@ namespace AffineTransformations
             MouseWheel -= Form1_MouseWheelRotate;
             MouseClick -= Form1_MouseSelectPointDilation;
             MouseClick -= Form1_MouseFindIntersection;
+            MouseClick -= Form1_MouseClassifyPointLocation;
+            MouseClick -= Form1_MousePointInsidePolygon;
             DrawAxis();
         }
 
@@ -369,6 +502,8 @@ namespace AffineTransformations
                 MouseWheel -= Form1_MouseWheelRotate;
                 MouseClick -= Form1_MouseSelectPointDilation;
                 MouseClick -= Form1_MouseFindIntersection;
+                MouseClick -= Form1_MouseClassifyPointLocation;
+                MouseClick -= Form1_MousePointInsidePolygon;
             }
             else if (cmb.SelectedIndex == 1)
             {
@@ -379,6 +514,8 @@ namespace AffineTransformations
                 MouseWheel += Form1_MouseWheelRotate;
                 MouseClick -= Form1_MouseSelectPointDilation;
                 MouseClick -= Form1_MouseFindIntersection;
+                MouseClick -= Form1_MouseClassifyPointLocation;
+                MouseClick -= Form1_MousePointInsidePolygon;
             }
             else if (cmb.SelectedIndex == 2)
             {
@@ -390,8 +527,10 @@ namespace AffineTransformations
                 MouseWheel -= Form1_MouseWheelRotate;
                 MouseClick += Form1_MouseSelectPointDilation;
                 MouseClick -= Form1_MouseFindIntersection;
+                MouseClick -= Form1_MouseClassifyPointLocation;
+                MouseClick -= Form1_MousePointInsidePolygon;
             }
-            else
+            else if (cmb.SelectedIndex == 3)
             {
                 secondLine.Clear();
                 label1.Visible = false;
@@ -399,6 +538,28 @@ namespace AffineTransformations
                 MouseWheel -= Form1_MouseWheelRotate;
                 MouseClick -= Form1_MouseSelectPointDilation;
                 MouseClick += Form1_MouseFindIntersection;
+                MouseClick -= Form1_MouseClassifyPointLocation;
+                MouseClick -= Form1_MousePointInsidePolygon;
+            }
+            else if (cmb.SelectedIndex == 4)
+            {
+                label1.Visible = false;
+                MouseClick -= Form1_MouseSelectPoint;
+                MouseWheel -= Form1_MouseWheelRotate;
+                MouseClick -= Form1_MouseSelectPointDilation;
+                MouseClick -= Form1_MouseFindIntersection;
+                MouseClick += Form1_MouseClassifyPointLocation;
+                MouseClick -= Form1_MousePointInsidePolygon;
+            }
+            else
+            {
+                label1.Visible = false;
+                MouseClick -= Form1_MouseSelectPoint;
+                MouseWheel -= Form1_MouseWheelRotate;
+                MouseClick -= Form1_MouseSelectPointDilation;
+                MouseClick -= Form1_MouseFindIntersection;
+                MouseClick -= Form1_MouseClassifyPointLocation;
+                MouseClick += Form1_MousePointInsidePolygon;
             }
         }
 
@@ -438,6 +599,8 @@ namespace AffineTransformations
             MouseWheel -= Form1_MouseWheelRotate;
             MouseClick -= Form1_MouseSelectPointDilation;
             MouseClick -= Form1_MouseFindIntersection;
+            MouseClick -= Form1_MouseClassifyPointLocation;
+            MouseClick -= Form1_MousePointInsidePolygon;
             DrawAxis();
             DrawFigure(currentFigure, Color.FromArgb(255, 20, 20, 20));
         }

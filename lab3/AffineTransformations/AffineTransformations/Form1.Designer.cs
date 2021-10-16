@@ -66,12 +66,14 @@ namespace AffineTransformations
             "Смещение на dx, dy",
             "Поворот",
             "Масштабирование",
-            "Точка пересечения отрезков"});
+            "Точка пересечения отрезков",
+            "Точка относительно ребра",
+            "Точка в многоугольнике"});
             this.comboBoxtransformation.Location = new System.Drawing.Point(13, 115);
             this.comboBoxtransformation.Name = "comboBoxtransformation";
             this.comboBoxtransformation.Size = new System.Drawing.Size(202, 23);
             this.comboBoxtransformation.TabIndex = 2;
-            this.comboBoxtransformation.Text = "Выберите преобразование";
+            this.comboBoxtransformation.Text = "Выберите метод";
             this.comboBoxtransformation.SelectedIndexChanged += new System.EventHandler(this.comboBoxtransformation_SelectedIndexChanged);
             // 
             // textBoxDx

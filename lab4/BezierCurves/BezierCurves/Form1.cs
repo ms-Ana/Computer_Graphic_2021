@@ -49,14 +49,27 @@ namespace BezierCurves
             deletingPoints = false;
             
             MouseDown += Form1_MouseDown;
-            MouseMove += Form1_MouseMove;
-            MouseUp += Form1_MouseUp;
+            /*MouseMove += Form1_MouseMove;
+            MouseUp += Form1_MouseUp;*/
             buttonDelete.Visible = false;
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
         {
-            if (deletingPoints)
+            SolidBrush brush = new SolidBrush(Color.Black);
+            g.Clear(SystemColors.Control);
+            points.Add(new double[2] { e.X - W, H - e.Y });
+            for (int i = 0; i < points.Count; i ++)
+            {
+                double[] p = (double[])points[i];
+                g.FillEllipse(brush, (int)p[0] + W - 1, H - (int)p[1] - 1, 3, 3);
+            }
+
+            //g.FillEllipse(brush, e.X - 1, e.Y - 1, 3, 3);
+            //points.Add(new double[2] { e.X - W, H - e.Y });
+            DrawNewBezierCurve();
+
+            /*if (deletingPoints)
             {
                 int currX = e.X - W;
                 int currY = H - e.Y;
@@ -109,7 +122,7 @@ namespace BezierCurves
                 double[] p3 = (double[])points[points.Count - 2];
                 double[] p4 = (double[])points[points.Count - 1];
                 DrawBezierCurve(p1, p2, p3, p4);
-            }
+            }*/
         }
 
         private void Form1_MouseMove(object sender, MouseEventArgs e)
@@ -256,7 +269,98 @@ namespace BezierCurves
 
         private void DrawBezierCurve(double[] p1, double[] p2, double[] p3, double[] p4)
         {
-            double newX = 0.5 * p1[0] + 0.5 * p2[0];
+            /*double newX = 0.5 * p1[0] + 0.5 * p2[0];
+            double newY = 0.5 * p1[1] + 0.5 * p2[1];
+            double[] newP1 = new double[2];
+            newP1[0] = newX; newP1[1] = newY;
+            newX = 0.5 * p3[0] + 0.5 * p4[0];
+            newY = 0.5 * p3[1] + 0.5 * p4[1];
+            double[] newP4 = new double[2];
+            newP4[0] = newX; newP4[1] = newY;*/
+
+            Pen pen = new Pen(Color.Red);
+            double lastX = p1[0];
+            double lastY = p1[1];
+            double currX, currY;
+            for (double t = 0; t <= 1 + rate; t += rate)
+            {
+                currX = (1 - t) * (1 - t) * (1 - t) * p1[0] + 
+                        3 * (1 - t) * (1 - t) * t * p2[0] + 
+                        3 * (1 - t) * t * t * p3[0] + t * t * t * p4[0];
+                currY = (1 - t) * (1 - t) * (1 - t) * p1[1] + 
+                        3 * (1 - t) * (1 - t) * t * p2[1] + 
+                        3 * (1 - t) * t * t * p3[1] + t * t * t * p4[1];
+                g.DrawLine(pen, (int)lastX + W, H - (int)lastY, (int)currX + W, H - (int)currY);
+                lastX = currX; lastY = currY;
+            }
+        }
+
+        private void DrawNewBezierCurve()
+        {
+            if (points.Count < 4)
+            {
+                return;
+            }
+
+            ArrayList newP = new ArrayList();
+            newP.AddRange(points);
+
+            while (newP.Count > 1)
+            {
+                if (newP.Count > 4)
+                {
+                    double[] third = (double[])newP[2];
+                    double[] fourth = (double[])newP[3];
+                    double newX = 0.5 * third[0] + 0.5 * fourth[0];
+                    double newY = 0.5 * third[1] + 0.5 * fourth[1];
+                    newP.Insert(3, new double[] { newX, newY });
+
+                    double[] p1 = (double[])newP[0];
+                    double[] p2 = (double[])newP[1];
+                    double[] p3 = (double[])newP[2];
+                    double[] p4 = (double[])newP[3];
+                    DrawBezierCurve(p1, p2, p3, p4);
+
+                    newP.RemoveAt(0);
+                    newP.RemoveAt(0);
+                    newP.RemoveAt(0);
+                }
+
+                else if (newP.Count == 4)
+                {
+                    double[] p1 = (double[])newP[0];
+                    double[] p2 = (double[])newP[1];
+                    double[] p3 = (double[])newP[2];
+                    double[] p4 = (double[])newP[3];
+                    DrawBezierCurve(p1, p2, p3, p4);
+
+                    newP.RemoveAt(0);
+                    newP.RemoveAt(0);
+                    newP.RemoveAt(0);
+                }
+
+                else if (newP.Count == 3)
+                {
+                    double[] third = (double[])newP[1];
+                    double[] fourth = (double[])newP[2];
+                    double newX = 0.5 * third[0] + 0.5 * fourth[0];
+                    double newY = 0.5 * third[1] + 0.5 * fourth[1];
+                    newP.Insert(2, new double[] { newX, newY });
+
+                    double[] p1 = (double[])newP[0];
+                    double[] p2 = (double[])newP[1];
+                    double[] p3 = (double[])newP[2];
+                    double[] p4 = (double[])newP[3];
+                    DrawBezierCurve(p1, p2, p3, p4);
+
+                    newP.RemoveAt(0);
+                    newP.RemoveAt(0);
+                    newP.RemoveAt(0);
+                }
+            }
+
+
+            /*double newX = 0.5 * p1[0] + 0.5 * p2[0];
             double newY = 0.5 * p1[1] + 0.5 * p2[1];
             double[] newP1 = new double[2];
             newP1[0] = newX; newP1[1] = newY;
@@ -271,15 +375,15 @@ namespace BezierCurves
             double currX, currY;
             for (double t = 0; t <= 1 + rate; t += rate)
             {
-                currX = (1 - t) * (1 - t) * (1 - t) * newP1[0] + 
-                        3 * (1 - t) * (1 - t) * t * p2[0] + 
+                currX = (1 - t) * (1 - t) * (1 - t) * newP1[0] +
+                        3 * (1 - t) * (1 - t) * t * p2[0] +
                         3 * (1 - t) * t * t * p3[0] + t * t * t * newP4[0];
-                currY = (1 - t) * (1 - t) * (1 - t) * newP1[1] + 
-                        3 * (1 - t) * (1 - t) * t * p2[1] + 
+                currY = (1 - t) * (1 - t) * (1 - t) * newP1[1] +
+                        3 * (1 - t) * (1 - t) * t * p2[1] +
                         3 * (1 - t) * t * t * p3[1] + t * t * t * newP4[1];
                 g.DrawLine(pen, (int)lastX + W, H - (int)lastY, (int)currX + W, H - (int)currY);
                 lastX = currX; lastY = currY;
-            }
+            }*/
         }
 
         private void DrawCurrentFigure()

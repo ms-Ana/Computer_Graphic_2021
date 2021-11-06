@@ -57,32 +57,35 @@ namespace SolidsOfRevolution
             // 
             // buttonX
             // 
+            this.buttonX.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
             this.buttonX.Location = new System.Drawing.Point(13, 127);
             this.buttonX.Name = "buttonX";
             this.buttonX.Size = new System.Drawing.Size(153, 33);
             this.buttonX.TabIndex = 2;
             this.buttonX.Text = "Относительно X";
-            this.buttonX.UseVisualStyleBackColor = true;
+            this.buttonX.UseVisualStyleBackColor = false;
             this.buttonX.Click += new System.EventHandler(this.buttonX_Click);
             // 
             // buttonY
             // 
+            this.buttonY.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.buttonY.Location = new System.Drawing.Point(13, 167);
             this.buttonY.Name = "buttonY";
             this.buttonY.Size = new System.Drawing.Size(153, 33);
             this.buttonY.TabIndex = 3;
             this.buttonY.Text = "Относительно Y";
-            this.buttonY.UseVisualStyleBackColor = true;
+            this.buttonY.UseVisualStyleBackColor = false;
             this.buttonY.Click += new System.EventHandler(this.buttonY_Click);
             // 
             // buttonZ
             // 
+            this.buttonZ.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
             this.buttonZ.Location = new System.Drawing.Point(13, 207);
             this.buttonZ.Name = "buttonZ";
             this.buttonZ.Size = new System.Drawing.Size(153, 33);
             this.buttonZ.TabIndex = 4;
             this.buttonZ.Text = "Относительно Z";
-            this.buttonZ.UseVisualStyleBackColor = true;
+            this.buttonZ.UseVisualStyleBackColor = false;
             this.buttonZ.Click += new System.EventHandler(this.buttonZ_Click);
             // 
             // Form1

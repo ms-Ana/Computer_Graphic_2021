@@ -15,7 +15,6 @@ namespace SolidsOfRevolution
     {
         private Graphics g;
         private int W, H;
-        private int scale = 100;
         private int rotations = 10;
 
         private List<Point> points;
@@ -108,6 +107,31 @@ namespace SolidsOfRevolution
                 }
                 rotations = r;
             }
+        }
+
+        private void DrawAxis()
+        {
+            Point3D startX = new Point3D(-2000, 0, 0);
+            Point3D startY = new Point3D(0, -2000, 0);
+            Point3D startZ = new Point3D(0, 0, -2000);
+            Point3D x = new Point3D(2000, 0, 0);
+            Point3D y = new Point3D(0, 2000, 0);
+            Point3D z = new Point3D(0, 0, 2000);
+
+            Line3D xAxis = new Line3D(startX, x);
+            Polygon3D s1 = new Polygon3D(new List<Line3D> { xAxis });
+            Polyhedron3D p1 = new Polyhedron3D(new List<Polygon3D> { s1 });
+            ShowAxis(p1.Axonometric(), Color.Red);
+
+            Line3D yAxis = new Line3D(startY, y);
+            Polygon3D s2 = new Polygon3D(new List<Line3D> { yAxis });
+            Polyhedron3D p2 = new Polyhedron3D(new List<Polygon3D> { s2 });
+            ShowAxis(p2.Axonometric(), Color.Blue);
+
+            Line3D zAxis = new Line3D(startZ, z);
+            Polygon3D s3 = new Polygon3D(new List<Line3D> { zAxis });
+            Polyhedron3D p3 = new Polyhedron3D(new List<Polygon3D> { s3 });
+            ShowAxis(p3.Axonometric(), Color.Green);
         }
 
         private void fixPoints()
@@ -228,6 +252,7 @@ namespace SolidsOfRevolution
             Polyhedron3D res = new Polyhedron3D(sides);
             Polyhedron3D axon = res.Axonometric();
             g.Clear(SystemColors.Control);
+            DrawAxis();
             ShowFigure(axon);
         }
 
@@ -334,6 +359,7 @@ namespace SolidsOfRevolution
             Polyhedron3D res = new Polyhedron3D(sides);
             Polyhedron3D axon = res.Axonometric();
             g.Clear(SystemColors.Control);
+            DrawAxis();
             ShowFigure(axon);
         }
 
@@ -440,12 +466,25 @@ namespace SolidsOfRevolution
             Polyhedron3D res = new Polyhedron3D(sides);
             Polyhedron3D axon = res.Axonometric();
             g.Clear(SystemColors.Control);
+            DrawAxis();
             ShowFigure(axon);
         }
 
         private void ShowFigure(Polyhedron3D polyhedron)
         {
             Pen pen = new Pen(Color.Black);
+            foreach (Polygon3D p in polyhedron.polygons)
+            {
+                foreach (Line3D l in p.lines)
+                {
+                    g.DrawLine(pen, (int)l.first.x + W, H - (int)l.first.y, (int)l.second.x + W, H - (int)l.second.y);
+                }
+            }
+        }
+
+        private void ShowAxis(Polyhedron3D polyhedron, Color color)
+        {
+            Pen pen = new Pen(color);
             foreach (Polygon3D p in polyhedron.polygons)
             {
                 foreach (Line3D l in p.lines)
@@ -504,13 +543,11 @@ namespace SolidsOfRevolution
         }
 
         public int Phi = 30;
-        public int Psi = 30;
 
         public Polyhedron3D Axonometric()
         {
             Polyhedron3D res = new Polyhedron3D(this.polygons);
             double phi_r = (Math.PI / 180) * Phi;
-            double psi_r = (Math.PI / 180) * Psi;
 
             foreach (Polygon3D p in polygons)
             {

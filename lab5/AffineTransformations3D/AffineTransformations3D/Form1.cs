@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Collections;
 
+
 namespace AffineTransformations3D
 {
     public partial class Form1 : Form
@@ -455,6 +456,7 @@ namespace AffineTransformations3D
         }
     }
 
+    public delegate double callable(double x, double y);
     public class Point3D
     {
         public double x { get; set; }
@@ -466,6 +468,12 @@ namespace AffineTransformations3D
             this.x = x;
             this.y = y;
             this.z = z;
+        }
+        public static Point3D operator -(Point3D leftPoint, Point3D rightPoint)
+        {
+            return new Point3D(leftPoint.x - rightPoint.x,
+                               leftPoint.y - rightPoint.y,
+                               leftPoint.z - rightPoint.z);
         }
     }
 
@@ -581,5 +589,203 @@ namespace AffineTransformations3D
 
             return res;
         }
+
+        public Point3D Center()
+        {
+            int pointCnt = 0;
+            double sumCoordX = 0, sumCoordY = 0, sumCoordZ = 0;
+            foreach (var polygon in polygons)
+                foreach (var line in polygon.lines)
+                {
+                    pointCnt += 2;
+                    sumCoordX += line.first.x + line.second.x;
+                    sumCoordY += line.first.y + line.second.y;
+                    sumCoordZ += line.first.z + line.second.z;
+                }
+            return new Point3D(sumCoordX / pointCnt, sumCoordY / pointCnt, sumCoordZ / pointCnt);
+
+        }
+        private void ApplyTransformation(double[,] transformationMatrix)
+        {
+            for (int i = 0; i < polygons.Count; i++)
+                for (int j = 0; j < polygons[i].lines.Count; j++)
+                {
+                    var firstPointMatrix = GraphMath3D.MatrixMultiplication(transformationMatrix,
+                                              GraphMath3D.Point3DToMatix(polygons[i].lines[j].first));
+                    var secondPointMatrix = GraphMath3D.MatrixMultiplication(transformationMatrix,
+                                              GraphMath3D.Point3DToMatix(polygons[i].lines[j].second));
+                    var firstPoint = new Point3D(firstPointMatrix[0, 0] / firstPointMatrix[3, 0],
+                                                 firstPointMatrix[1, 0] / firstPointMatrix[3, 0],
+                                                 firstPointMatrix[2, 0] / firstPointMatrix[3, 0]);
+                    var secondPoint = new Point3D(secondPointMatrix[0, 0] / secondPointMatrix[3, 0],
+                                                 secondPointMatrix[1, 0] / secondPointMatrix[3, 0],
+                                                 secondPointMatrix[2, 0] / secondPointMatrix[3, 0]);
+                    polygons[i].lines[j].first = firstPoint;
+                    polygons[i].lines[j].second = secondPoint;
+                }
+        }
+
+        public void Scale(double sx, double sy, double sz)
+        {
+            ApplyTransformation(GraphMath3D.ScaleMatrix(sx, sy, sz));
+        }
+
+        public void ScaleCenter(double sx, double sy, double sz)
+        {
+            var center = Center();
+            ApplyTransformation(GraphMath3D.TranslationMatrix(-center.x, -center.y, -center.z));
+            Scale(sz, sy, sz);
+            ApplyTransformation(GraphMath3D.TranslationMatrix(center.x, center.y, center.z));
+        }
+
+        public void Reflect(string axis)
+        {
+            ApplyTransformation(GraphMath3D.ReflectionMatrix(axis));
+        }
+
+        public void RotateCenter(double angleX, double angleY, double angleZ)
+        {
+            var center = Center();
+            ApplyTransformation(GraphMath3D.TranslationMatrix(-center.x, -center.y, -center.z));
+            ApplyTransformation(GraphMath3D.RotationMatrix(angleX, angleY, angleZ));
+            ApplyTransformation(GraphMath3D.TranslationMatrix(center.x, center.y, center.z));
+        }
+
+        public void RotateLine(double angle, Line3D line)
+        {
+            var centerVector = line.second - line.first;
+            var vectorLength = Math.Sqrt(centerVector.x * centerVector.x +
+                                         centerVector.y * centerVector.y +
+                                         centerVector.z * centerVector.z);
+            double l = centerVector.x / vectorLength, m = centerVector.y / vectorLength,
+                n = centerVector.z / vectorLength;
+            angle *= Math.PI / 180;
+            var sin = Math.Sin(angle);
+            var cos = Math.Cos(angle);
+            double[,] transformationMatrix = {{l*l+cos*(1-l*l),   l*(1-cos)*m-n*sin, l*(1-cos)*n+m*sin, 0},
+                                              {l*(1-cos)*m+n*sin, m*m+cos*(1-m*m),   m*(1-cos)*n-l*sin, 0},
+                                              {l*(1-cos)*n-m*sin, m*(1-cos)*n+l*sin, n*n+cos*(1-n*n),   0},
+                                              {                0,                 0,                 0, 1}};
+            ApplyTransformation(transformationMatrix);
+        }
+
+        public static Polyhedron3D Graphic(callable func, int countStep, double X0, double X1, double Y0, double Y1)
+        {
+            double stepX = (X1 - X0) / countStep, stepY = (Y1 - Y0) / countStep,
+                   currentX = X0, currentY = Y0;
+            List<Point3D> points = new List<Point3D>();
+            for (int i = 0; i < countStep; i++)
+            {
+                currentX = X0;
+                for (int j = 0; j < countStep; j++)
+                {
+                    points.Add(new Point3D(currentX, currentY, func(currentX, currentY)));
+                    currentX += stepX;
+                }
+                currentY += stepY;
+            }
+
+            List<Polygon3D> polygons = new List<Polygon3D>();
+
+            for (int i = 0; i < countStep; i++)
+                for (int j = 0; j < countStep; j++)
+                {
+                    Line3D l1 = new Line3D(points[i * (countStep + 1) + j], points[i * (countStep + 1) + j + 1]);
+                    Line3D l2 = new Line3D(points[i * (countStep + 1) + j + 1], points[(i + 1) * (countStep + 1) + (j + 1)]);
+                    Line3D l3 = new Line3D(points[(i + 1) * (countStep + 1) + (j + 1)], points[(i + 1) * (countStep + 1) + j]);
+                    Line3D l4 = new Line3D(points[(i + 1) * (countStep + 1) + j], points[i * (countStep + 1) + j]);
+                    polygons.Add(new Polygon3D(new List<Line3D> { l1, l2, l3, l4 }));
+                }
+            return new Polyhedron3D(polygons);
+        }
+    }
+    public class GraphMath3D
+    {
+        public static double[,] MatrixMultiplication(double[,] leftMatrix, double[,] rightMatrix)
+        {
+            double[,] resultMatrix = new double[leftMatrix.GetLength(0), rightMatrix.GetLength(1)];
+            for (int i = 0; i < resultMatrix.GetLength(0); i++)
+                for (int j = 0; j < resultMatrix.GetLength(1); j++)
+                    for (int k = 0; k < leftMatrix.GetLength(0); k++)
+                        resultMatrix[i, j] += leftMatrix[i, k] * rightMatrix[k, j];
+            return resultMatrix;
+        }
+        public static double[,] TranslationMatrix(double dx, double dy, double dz)
+        {
+            return new double[,] {{1,0,0,dx},
+                                  {0,1,0,dy},
+                                  {0,0,1,dz},
+                                  {0,0,0,1}};
+        }
+        public static double[,] ScaleMatrix(double sx, double sy, double sz)
+        {
+            return new double[,]  {{sx,0,0,0},
+                                   {0,sy,0,0},
+                                   {0,0,sz,0},
+                                   {0,0,0,1}};
+        }
+        public static double[,] ReflectionMatrix(string axis)
+        {
+            switch (axis)
+            {
+                case "xy":
+                    return new double[,]{{1,0,0,0},
+                                         {0,1,0,0},
+                                         {0,0,-1,0},
+                                         {0,0,0,1} };
+                case "xz":
+                    return new double[,] {{1,0,0,0},
+                                          {0,-1,0,0},
+                                          {0,0,1,0},
+                                          {0,0,0,1}};
+                case "yz":
+                    return new double[,] {{-1,0,0,0},
+                                          {0,1,0,0},
+                                          {0,0,1,0},
+                                          {0,0,0,1}};
+                default:
+                    return null;
+            }
+        }
+        public static double[,] RotationMatrix(double angleX, double angleY, double angleZ)
+        {
+            angleX *= Math.PI / 180;
+            angleY *= Math.PI / 180;
+            angleZ *= Math.PI / 180;
+            var sin = Math.Sin(angleX);
+            var cos = Math.Cos(angleX);
+            double[,] rotationX = {{1,  0,   0, 0},
+                                   {0,cos,-sin, 0},
+                                   {0,sin, cos, 0},
+                                   {0,  0,   0, 1}};
+            sin = Math.Sin(angleY);
+            cos = Math.Cos(angleY);
+            double[,] rotationY = {{cos, 0, sin, 0},
+                                   {  0, 1,   0, 0},
+                                   {-sin,0, cos, 0},
+                                   {  0, 0,   0, 0}};
+            sin = Math.Sin(angleZ);
+            cos = Math.Cos(angleZ);
+            double[,] rotationZ = {{cos,-sin,0,0},
+                                   {sin, cos,0,0},
+                                   {  0,   0,1,0},
+                                   {  0,   0,0,1}};
+            return MatrixMultiplication(MatrixMultiplication(rotationX, rotationY), rotationZ);
+
+        }
+        public static double[,] Point3DToMatix(Point3D point)
+        {
+            return new double[,] {{ point.x },
+                                  { point.y },
+                                  { point.z },
+                                  { 1 }};
+        }
+    }
+
+    public class ZBuffer
+    {
+        private List<int> Interpolate(int d0, int d1, int i0, int i1)
+        { return null; }
+
     }
 }

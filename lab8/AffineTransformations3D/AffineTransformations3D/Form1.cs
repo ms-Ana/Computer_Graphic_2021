@@ -21,6 +21,8 @@ namespace AffineTransformations3D
         private int currentPolyhedron;
         private bool currentAxonometric;
         private Polyhedron3D current;
+        private List<int> removed;
+        bool remove = true;
 
         private double rotationAngle;
         private int rotation;
@@ -48,6 +50,7 @@ namespace AffineTransformations3D
             rotating = false;
             HideButtons(false);
             points = new List<Point>();
+            removed = new List<int>();
         }
 
         private Polyhedron3D Hexahedron(int scale)
@@ -62,27 +65,27 @@ namespace AffineTransformations3D
             Point3D p8 = new Point3D(scale, scale, scale);
 
             Line3D l1 = new Line3D(p6, p8);
-            Line3D l2 = new Line3D(p4, p6);
-            Line3D l3 = new Line3D(p4, p7);
-            Line3D l4 = new Line3D(p7, p8);
+            Line3D l2 = new Line3D(p8, p7);
+            Line3D l3 = new Line3D(p7, p4);
+            Line3D l4 = new Line3D(p4, p6);
             Polygon3D side1 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4 });
 
-            l1 = new Line3D(p6, p2);
-            l2 = new Line3D(p4, p6);
-            l3 = new Line3D(p2, p1);
-            l4 = new Line3D(p1, p4);
+            l1 = new Line3D(p2, p6);
+            l2 = new Line3D(p6, p4);
+            l3 = new Line3D(p4, p1);
+            l4 = new Line3D(p1, p2);
             Polygon3D side2 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4 });
 
-            l1 = new Line3D(p6, p8);
-            l2 = new Line3D(p2, p6);
+            l1 = new Line3D(p8, p6);
+            l2 = new Line3D(p6, p2);
             l3 = new Line3D(p2, p5);
             l4 = new Line3D(p5, p8);
             Polygon3D side3 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4 });
 
-            l1 = new Line3D(p1, p3);
-            l2 = new Line3D(p1, p2);
-            l3 = new Line3D(p2, p5);
-            l4 = new Line3D(p5, p3);
+            l1 = new Line3D(p5, p2);
+            l2 = new Line3D(p2, p1);
+            l3 = new Line3D(p1, p3);
+            l4 = new Line3D(p3, p5);
             Polygon3D side4 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4 });
 
             l1 = new Line3D(p7, p8);
@@ -92,9 +95,9 @@ namespace AffineTransformations3D
             Polygon3D side5 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4 });
 
             l1 = new Line3D(p4, p7);
-            l2 = new Line3D(p4, p1);
-            l3 = new Line3D(p1, p3);
-            l4 = new Line3D(p3, p7);
+            l2 = new Line3D(p7, p3);
+            l3 = new Line3D(p3, p1);
+            l4 = new Line3D(p1, p4);
             Polygon3D side6 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4 });
 
             Polyhedron3D p = new Polyhedron3D(new List<Polygon3D> { side1, side2, side3, side4, side5, side6 });
@@ -109,9 +112,9 @@ namespace AffineTransformations3D
             Point3D p4 = new Point3D(0, 0, scale);
             Point3D p8 = new Point3D(scale, scale, scale);
 
-            Line3D l1 = new Line3D(p4, p2);
-            Line3D l2 = new Line3D(p2, p8);
-            Line3D l3 = new Line3D(p8, p4);
+            Line3D l1 = new Line3D(p2, p8);
+            Line3D l2 = new Line3D(p8, p4);
+            Line3D l3 = new Line3D(p4, p2);
             Polygon3D side1 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
             l1 = new Line3D(p8, p2);
@@ -119,14 +122,14 @@ namespace AffineTransformations3D
             l3 = new Line3D(p3, p8);
             Polygon3D side2 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
-            l1 = new Line3D(p4, p8);
-            l2 = new Line3D(p8, p3);
-            l3 = new Line3D(p3, p4);
+            l1 = new Line3D(p3, p4);
+            l2 = new Line3D(p4, p8);
+            l3 = new Line3D(p8, p3);
             Polygon3D side3 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
-            l1 = new Line3D(p4, p2);
-            l2 = new Line3D(p2, p3);
-            l3 = new Line3D(p3, p4);
+            l1 = new Line3D(p4, p3);
+            l2 = new Line3D(p3, p2);
+            l3 = new Line3D(p2, p4);
             Polygon3D side4 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
             Polyhedron3D p = new Polyhedron3D(new List<Polygon3D> { side1, side2, side3, side4 });
@@ -147,14 +150,14 @@ namespace AffineTransformations3D
             Line3D l3 = new Line3D(p3, p1);
             Polygon3D side1 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
-            l1 = new Line3D(p1, p2);
-            l2 = new Line3D(p2, p4);
-            l3 = new Line3D(p4, p1);
+            l1 = new Line3D(p1, p4);
+            l2 = new Line3D(p4, p2);
+            l3 = new Line3D(p2, p1);
             Polygon3D side2 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
-            l1 = new Line3D(p1, p4);
-            l2 = new Line3D(p4, p6);
-            l3 = new Line3D(p6, p1);
+            l1 = new Line3D(p1, p6);
+            l2 = new Line3D(p6, p4);
+            l3 = new Line3D(p4, p1);
             Polygon3D side3 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
             l1 = new Line3D(p1, p3);
@@ -162,9 +165,9 @@ namespace AffineTransformations3D
             l3 = new Line3D(p6, p1);
             Polygon3D side4 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
-            l1 = new Line3D(p2, p3);
-            l2 = new Line3D(p3, p5);
-            l3 = new Line3D(p5, p2);
+            l1 = new Line3D(p3, p2);
+            l2 = new Line3D(p2, p5);
+            l3 = new Line3D(p5, p3);
             Polygon3D side5 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
             l1 = new Line3D(p2, p4);
@@ -177,9 +180,9 @@ namespace AffineTransformations3D
             l3 = new Line3D(p5, p4);
             Polygon3D side7 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
-            l1 = new Line3D(p3, p6);
-            l2 = new Line3D(p6, p5);
-            l3 = new Line3D(p5, p3);
+            l1 = new Line3D(p6, p3);
+            l2 = new Line3D(p3, p5);
+            l3 = new Line3D(p5, p6);
             Polygon3D side8 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
             Polyhedron3D p = new Polyhedron3D(new List<Polygon3D> { side1, side2, side3, side4, side5, side6, side7, side8 });
@@ -244,9 +247,9 @@ namespace AffineTransformations3D
             z += val;
             Point3D p12 = new Point3D(0, 0, z);
 
-            Line3D l1 = new Line3D(p1, p5);
-            Line3D l2 = new Line3D(p5, p4);
-            Line3D l3 = new Line3D(p4, p1);
+            Line3D l1 = new Line3D(p1, p4);
+            Line3D l2 = new Line3D(p4, p5);
+            Line3D l3 = new Line3D(p5, p1);
             Polygon3D side1 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
             l1 = new Line3D(p1, p5);
@@ -270,9 +273,9 @@ namespace AffineTransformations3D
             Polygon3D side5 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
 
-            l1 = new Line3D(p7, p4);
-            l2 = new Line3D(p4, p5);
-            l3 = new Line3D(p5, p7);
+            l1 = new Line3D(p7, p5);
+            l2 = new Line3D(p5, p4);
+            l3 = new Line3D(p4, p7);
             Polygon3D side6 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
             l1 = new Line3D(p7, p8);
@@ -280,9 +283,9 @@ namespace AffineTransformations3D
             l3 = new Line3D(p5, p7);
             Polygon3D side7 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
-            l1 = new Line3D(p8, p5);
-            l2 = new Line3D(p5, p6);
-            l3 = new Line3D(p6, p8);
+            l1 = new Line3D(p8, p6);
+            l2 = new Line3D(p6, p5);
+            l3 = new Line3D(p5, p8);
             Polygon3D side8 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
             l1 = new Line3D(p8, p9);
@@ -300,9 +303,9 @@ namespace AffineTransformations3D
             l3 = new Line3D(p2, p9);
             Polygon3D side11 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
-            l1 = new Line3D(p10, p2);
-            l2 = new Line3D(p2, p3);
-            l3 = new Line3D(p3, p10);
+            l1 = new Line3D(p10, p3);
+            l2 = new Line3D(p3, p2);
+            l3 = new Line3D(p2, p10);
             Polygon3D side12 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
             l1 = new Line3D(p10, p11);
@@ -310,40 +313,40 @@ namespace AffineTransformations3D
             l3 = new Line3D(p3, p10);
             Polygon3D side13 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
-            l1 = new Line3D(p11, p3);
-            l2 = new Line3D(p3, p4);
-            l3 = new Line3D(p4, p11);
+            l1 = new Line3D(p11, p4);
+            l2 = new Line3D(p4, p3);
+            l3 = new Line3D(p3, p11);
             Polygon3D side14 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
-            l1 = new Line3D(p11, p4);
-            l2 = new Line3D(p4, p7);
-            l3 = new Line3D(p7, p11);
+            l1 = new Line3D(p11, p7);
+            l2 = new Line3D(p7, p4);
+            l3 = new Line3D(p4, p11);
             Polygon3D side15 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
 
-            l1 = new Line3D(p12, p7);
-            l2 = new Line3D(p7, p8);
-            l3 = new Line3D(p8, p12);
+            l1 = new Line3D(p12, p8);
+            l2 = new Line3D(p8, p7);
+            l3 = new Line3D(p7, p12);
             Polygon3D side16 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
-            l1 = new Line3D(p12, p8);
-            l2 = new Line3D(p8, p9);
-            l3 = new Line3D(p9, p12);
+            l1 = new Line3D(p12, p9);
+            l2 = new Line3D(p9, p8);
+            l3 = new Line3D(p8, p12);
             Polygon3D side17 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
-            l1 = new Line3D(p12, p9);
-            l2 = new Line3D(p9, p10);
-            l3 = new Line3D(p10, p12);
+            l1 = new Line3D(p12, p10);
+            l2 = new Line3D(p10, p9);
+            l3 = new Line3D(p9, p12);
             Polygon3D side18 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
-            l1 = new Line3D(p12, p10);
-            l2 = new Line3D(p10, p11);
-            l3 = new Line3D(p11, p12);
+            l1 = new Line3D(p12, p11);
+            l2 = new Line3D(p11, p10);
+            l3 = new Line3D(p10, p12);
             Polygon3D side19 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
-            l1 = new Line3D(p12, p11);
-            l2 = new Line3D(p11, p7);
-            l3 = new Line3D(p7, p12);
+            l1 = new Line3D(p12, p7);
+            l2 = new Line3D(p7, p11);
+            l3 = new Line3D(p11, p12);
             Polygon3D side20 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
 
             Polyhedron3D p = new Polyhedron3D(new List<Polygon3D> { side1, side2, side3, side4, side5, side6, side7, side8, side9, side10,
@@ -539,11 +542,11 @@ namespace AffineTransformations3D
             Line3D l5 = new Line3D(d5, d1);
             side1 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4, l5 });
 
-            l1 = new Line3D(d1, d2);
-            l2 = new Line3D(d2, d8);
-            l3 = new Line3D(d8, d7);
-            l4 = new Line3D(d7, d6);
-            l5 = new Line3D(d6, d1);
+            l1 = new Line3D(d1, d6);
+            l2 = new Line3D(d6, d7);
+            l3 = new Line3D(d7, d8);
+            l4 = new Line3D(d8, d2);
+            l5 = new Line3D(d2, d1);
             side2 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4, l5 });
 
             l1 = new Line3D(d2, d8);
@@ -567,25 +570,25 @@ namespace AffineTransformations3D
             l5 = new Line3D(d5, d4);
             side5 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4, l5 });
 
-            l1 = new Line3D(d1, d6);
-            l2 = new Line3D(d6, d15);
-            l3 = new Line3D(d15, d14);
-            l4 = new Line3D(d14, d5);
-            l5 = new Line3D(d5, d1);
+            l1 = new Line3D(d1, d5);
+            l2 = new Line3D(d5, d14);
+            l3 = new Line3D(d14, d15);
+            l4 = new Line3D(d15, d6);
+            l5 = new Line3D(d6, d1);
             side6 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4, l5 });
 
-            l1 = new Line3D(d6, d7);
-            l2 = new Line3D(d7, d16);
-            l3 = new Line3D(d16, d20);
-            l4 = new Line3D(d20, d15);
-            l5 = new Line3D(d15, d6);
+            l1 = new Line3D(d6, d15);
+            l2 = new Line3D(d15, d20);
+            l3 = new Line3D(d20, d16);
+            l4 = new Line3D(d16, d7);
+            l5 = new Line3D(d7, d6);
             side7 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4, l5 });
 
-            l1 = new Line3D(d8, d9);
-            l2 = new Line3D(d9, d17);
-            l3 = new Line3D(d17, d16);
-            l4 = new Line3D(d16, d7);
-            l5 = new Line3D(d7, d8);
+            l1 = new Line3D(d8, d7);
+            l2 = new Line3D(d7, d16);
+            l3 = new Line3D(d16, d17);
+            l4 = new Line3D(d17, d9);
+            l5 = new Line3D(d9, d8);
             side8 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4, l5 });
 
             l1 = new Line3D(d10, d9);
@@ -602,18 +605,18 @@ namespace AffineTransformations3D
             l5 = new Line3D(d12, d11);
             side10 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4, l5 });
 
-            l1 = new Line3D(d14, d15);
-            l2 = new Line3D(d15, d20);
-            l3 = new Line3D(d20, d19);
-            l4 = new Line3D(d19, d13);
-            l5 = new Line3D(d13, d14);
+            l1 = new Line3D(d14, d13);
+            l2 = new Line3D(d13, d19);
+            l3 = new Line3D(d19, d20);
+            l4 = new Line3D(d20, d15);
+            l5 = new Line3D(d15, d14);
             side11 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4, l5 });
 
-            l1 = new Line3D(d16, d17);
-            l2 = new Line3D(d17, d18);
-            l3 = new Line3D(d18, d19);
-            l4 = new Line3D(d19, d20);
-            l5 = new Line3D(d20, d16);
+            l1 = new Line3D(d16, d20);
+            l2 = new Line3D(d20, d19);
+            l3 = new Line3D(d19, d18);
+            l4 = new Line3D(d18, d17);
+            l5 = new Line3D(d17, d16);
             side12 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4, l5 });
 
             Polyhedron3D p = new Polyhedron3D(new List<Polygon3D> { side1, side2, side3, side4, side5, side6, side7, 
@@ -658,7 +661,7 @@ namespace AffineTransformations3D
             currentAxonometric = true;
             g.Clear(SystemColors.Control);
             DrawAxisAxonometric();
-            ShowFigure(current.Axonometric(), Color.Black);
+            ShowFigure(current.Axonometric(), Color.Black, remove);
         }
 
         private void buttonPerspective_Click(object sender, EventArgs e)
@@ -666,7 +669,7 @@ namespace AffineTransformations3D
             currentAxonometric = false;
             g.Clear(SystemColors.Control);
             DrawAxisPerspective();
-            ShowFigure(current.Perspective(), Color.Black);
+            ShowFigure(current.Perspective(), Color.Black, remove);
         }
 
         private void TranslateFigure()
@@ -686,12 +689,12 @@ namespace AffineTransformations3D
                     if (currentAxonometric)
                     {
                         DrawAxisAxonometric();
-                        ShowFigure(current.Axonometric(), Color.Black);
+                        ShowFigure(current.Axonometric(), Color.Black, remove);
                     }
                     else
                     {
                         DrawAxisPerspective();
-                        ShowFigure(current.Perspective(), Color.Black);
+                        ShowFigure(current.Perspective(), Color.Black, remove);
                     }
                 }
             }
@@ -714,12 +717,12 @@ namespace AffineTransformations3D
                     if (currentAxonometric)
                     {
                         DrawAxisAxonometric();
-                        ShowFigure(current.Axonometric(), Color.Black);
+                        ShowFigure(current.Axonometric(), Color.Black, remove);
                     }
                     else
                     {
                         DrawAxisPerspective();
-                        ShowFigure(current.Perspective(), Color.Black);
+                        ShowFigure(current.Perspective(), Color.Black, remove);
                     }
                 }
             }
@@ -732,12 +735,12 @@ namespace AffineTransformations3D
             if (currentAxonometric)
             {
                 DrawAxisAxonometric();
-                ShowFigure(current.Axonometric(), Color.Black);
+                ShowFigure(current.Axonometric(), Color.Black, remove);
             }
             else
             {
                 DrawAxisPerspective();
-                ShowFigure(current.Perspective(), Color.Black);
+                ShowFigure(current.Perspective(), Color.Black, remove);
             }
         }
 
@@ -790,12 +793,12 @@ namespace AffineTransformations3D
             if (currentAxonometric)
             {
                 DrawAxisAxonometric();
-                ShowFigure(current.Axonometric(), Color.Black);
+                ShowFigure(current.Axonometric(), Color.Black, remove);
             }
             else
             {
                 DrawAxisPerspective();
-                ShowFigure(current.Perspective(), Color.Black);
+                ShowFigure(current.Perspective(), Color.Black, remove);
             }
         }
 
@@ -859,17 +862,17 @@ namespace AffineTransformations3D
             Line3D xAxis = new Line3D(startX, x);
             Polygon3D s1 = new Polygon3D(new List<Line3D> { xAxis });
             Polyhedron3D p1 = new Polyhedron3D(new List<Polygon3D> { s1 });
-            ShowFigure(p1.Axonometric(), Color.Red);
+            ShowFigure(p1.Axonometric(), Color.Red, false);
 
             Line3D yAxis = new Line3D(startY, y);
             Polygon3D s2 = new Polygon3D(new List<Line3D> { yAxis });
             Polyhedron3D p2 = new Polyhedron3D(new List<Polygon3D> { s2 });
-            ShowFigure(p2.Axonometric(), Color.Blue);
+            ShowFigure(p2.Axonometric(), Color.Blue, false);
 
             Line3D zAxis = new Line3D(startZ, z);
             Polygon3D s3 = new Polygon3D(new List<Line3D> { zAxis });
             Polyhedron3D p3 = new Polyhedron3D(new List<Polygon3D> { s3 });
-            ShowFigure(p3.Axonometric(), Color.Green);
+            ShowFigure(p3.Axonometric(), Color.Green, false);
         }
 
         private void DrawAxisPerspective()
@@ -884,17 +887,81 @@ namespace AffineTransformations3D
             Line3D xAxis = new Line3D(startX, x);
             Polygon3D s1 = new Polygon3D(new List<Line3D> { xAxis });
             Polyhedron3D p1 = new Polyhedron3D(new List<Polygon3D> { s1 });
-            ShowFigure(p1.Perspective(), Color.Red);
+            ShowFigure(p1.Perspective(), Color.Red, false);
 
             Line3D yAxis = new Line3D(startY, y);
             Polygon3D s2 = new Polygon3D(new List<Line3D> { yAxis });
             Polyhedron3D p2 = new Polyhedron3D(new List<Polygon3D> { s2 });
-            ShowFigure(p2.Perspective(), Color.Blue);
+            ShowFigure(p2.Perspective(), Color.Blue, false);
 
             Line3D zAxis = new Line3D(startZ, z);
             Polygon3D s3 = new Polygon3D(new List<Line3D> { zAxis });
             Polyhedron3D p3 = new Polyhedron3D(new List<Polygon3D> { s3 });
-            ShowFigure(p3.Perspective(), Color.Green);
+            ShowFigure(p3.Perspective(), Color.Green, false);
+        }
+
+        private void DeleteNotFrontFacingSides()
+        {
+            removed.Clear();
+            double projX, projY, projZ;
+            if (currentAxonometric)
+            {
+                projX = -Math.Sqrt(8);
+                projY = 3;
+                projZ = -Math.Sqrt(8);
+            }
+            else
+            {
+                projX = 0;
+                projY = 0;
+                projZ = 1;
+            }
+
+            for (int i = 0; i < current.polygons.Count(); i++)
+            {
+                Polygon3D polygon = current.polygons[i];
+                double nx = polygon.lines[0].second.x - polygon.lines[0].first.x;
+                double ny = polygon.lines[0].second.y - polygon.lines[0].first.y;
+                double nz = polygon.lines[0].second.z - polygon.lines[0].first.z;
+
+                double ax = nx;
+                double ay = ny;
+                double az = nz;
+
+                double bx = polygon.lines[1].second.x - polygon.lines[1].first.x;
+                double by = polygon.lines[1].second.y - polygon.lines[1].first.y;
+                double bz = polygon.lines[1].second.z - polygon.lines[1].first.z;
+
+                nx = ay * bz - az * by;
+                ny = az * bx - ax * bz;
+                nz = ax * by - ay * bx;
+
+                /*for (int j = 1; j < polygon.lines.Count(); j++)
+                {
+                    double ax = nx;
+                    double ay = ny;
+                    double az = nz;
+
+                    double bx = polygon.lines[j].second.x - polygon.lines[j].first.x;
+                    double by = polygon.lines[j].second.y - polygon.lines[j].first.y;
+                    double bz = polygon.lines[j].second.z - polygon.lines[j].first.z;
+
+                    nx = ay * bz - az * by;
+                    ny = az * bx - ax * bz;
+                    nz = ax * by - ay * bx;
+                }*/
+
+                double cos = (projX * nx + projY * ny + projZ * nz) / 
+                    (Math.Sqrt(projX * projX + projY * projY + projZ * projZ) * Math.Sqrt(nx * nx + ny * ny + nz * nz));
+                double arccos = Math.Acos(cos);
+                double angle = (180 / Math.PI) * arccos;
+                if (angle > 90 && angle < 180)
+                {
+                    /*current.polygons.RemoveAt(i);
+                    i--;*/
+                    removed.Add(i);
+                }
+            }
         }
 
         private void buttonTranslation_Click(object sender, EventArgs e)
@@ -1178,8 +1245,8 @@ namespace AffineTransformations3D
                 Point3D p1 = new Point3D(x[0], newY[0], newZ[0]);
                 Point3D p2 = new Point3D(x[0], y[0], z[0]);
                 Line3D l1 = new Line3D(pFirst, p1);
-                Line3D l2 = new Line3D(pFirst, p2);
-                Line3D l3 = new Line3D(p1, p2);
+                Line3D l2 = new Line3D(p1, p2);
+                Line3D l3 = new Line3D(p2, pFirst);
                 Polygon3D side = new Polygon3D(new List<Line3D>() { l1, l2, l3 });
                 sides.Add(side);
 
@@ -1190,18 +1257,18 @@ namespace AffineTransformations3D
                     Point3D point3 = new Point3D(x[j], y[j], z[j]);
                     Point3D point4 = new Point3D(x[j + 1], y[j + 1], z[j + 1]);
                     Line3D line1 = new Line3D(point1, point2);
-                    Line3D line2 = new Line3D(point1, point3);
-                    Line3D line3 = new Line3D(point3, point4);
-                    Line3D line4 = new Line3D(point2, point4);
+                    Line3D line2 = new Line3D(point2, point4);
+                    Line3D line3 = new Line3D(point4, point3);
+                    Line3D line4 = new Line3D(point3, point1);
                     Polygon3D side1 = new Polygon3D(new List<Line3D>() { line1, line2, line3, line4 });
                     sides.Add(side1);
                 }
 
                 p1 = new Point3D(x[x.Count - 1], newY[newY.Count - 1], newZ[newZ.Count - 1]);
                 p2 = new Point3D(x[x.Count - 1], y[y.Count - 1], z[z.Count - 1]);
-                l1 = new Line3D(pLast, p1);
+                l1 = new Line3D(p1, pLast);
                 l2 = new Line3D(pLast, p2);
-                l3 = new Line3D(p1, p2);
+                l3 = new Line3D(p2, p1);
                 side = new Polygon3D(new List<Line3D>() { l1, l2, l3 });
                 sides.Add(side);
 
@@ -1217,8 +1284,8 @@ namespace AffineTransformations3D
             Point3D lastPoint1 = new Point3D(points[2].Y, points[2].X, 0);
             Point3D lastPoint2 = new Point3D(x[0], y[0], z[0]);
             Line3D lastLine1 = new Line3D(pFirst, lastPoint1);
-            Line3D lastLine2 = new Line3D(pFirst, lastPoint2);
-            Line3D lastLine3 = new Line3D(lastPoint1, lastPoint2);
+            Line3D lastLine2 = new Line3D(lastPoint1, lastPoint2);
+            Line3D lastLine3 = new Line3D(lastPoint2, pFirst);
             Polygon3D lastSide = new Polygon3D(new List<Line3D>() { lastLine1, lastLine2, lastLine3 });
             sides.Add(lastSide);
 
@@ -1229,18 +1296,18 @@ namespace AffineTransformations3D
                 Point3D point3 = new Point3D(x[j], y[j], z[j]);
                 Point3D point4 = new Point3D(x[j + 1], y[j + 1], z[j + 1]);
                 Line3D line1 = new Line3D(point1, point2);
-                Line3D line2 = new Line3D(point1, point3);
-                Line3D line3 = new Line3D(point3, point4);
-                Line3D line4 = new Line3D(point2, point4);
+                Line3D line2 = new Line3D(point2, point4);
+                Line3D line3 = new Line3D(point4, point3);
+                Line3D line4 = new Line3D(point3, point1);
                 Polygon3D side1 = new Polygon3D(new List<Line3D>() { line1, line2, line3, line4 });
                 sides.Add(side1);
             }
 
             lastPoint1 = new Point3D(points[points.Count - 1].Y, points[points.Count - 1].X, 0);
             lastPoint2 = new Point3D(x[x.Count - 1], y[y.Count - 1], z[z.Count - 1]);
-            lastLine1 = new Line3D(pLast, lastPoint1);
+            lastLine1 = new Line3D(lastPoint1, pLast);
             lastLine2 = new Line3D(pLast, lastPoint2);
-            lastLine3 = new Line3D(lastPoint1, lastPoint2);
+            lastLine3 = new Line3D(lastPoint2, lastPoint1);
             lastSide = new Polygon3D(new List<Line3D>() { lastLine1, lastLine2, lastLine3 });
             sides.Add(lastSide);
 
@@ -1249,12 +1316,12 @@ namespace AffineTransformations3D
             if (currentAxonometric)
             {
                 DrawAxisAxonometric();
-                ShowFigure(current.Axonometric(), Color.Black);
+                ShowFigure(current.Axonometric(), Color.Black, remove);
             }
             else
             {
                 DrawAxisPerspective();
-                ShowFigure(current.Perspective(), Color.Black);
+                ShowFigure(current.Perspective(), Color.Black, remove);
             }
         }
 
@@ -1292,8 +1359,8 @@ namespace AffineTransformations3D
                 Point3D p1 = new Point3D(newX[0], y[0], newZ[0]);
                 Point3D p2 = new Point3D(x[0], y[0], z[0]);
                 Line3D l1 = new Line3D(pFirst, p1);
-                Line3D l2 = new Line3D(pFirst, p2);
-                Line3D l3 = new Line3D(p1, p2);
+                Line3D l2 = new Line3D(p1, p2);
+                Line3D l3 = new Line3D(p2, pFirst);
                 Polygon3D side = new Polygon3D(new List<Line3D>() { l1, l2, l3 });
                 sides.Add(side);
 
@@ -1304,18 +1371,18 @@ namespace AffineTransformations3D
                     Point3D point3 = new Point3D(x[j], y[j], z[j]);
                     Point3D point4 = new Point3D(x[j + 1], y[j + 1], z[j + 1]);
                     Line3D line1 = new Line3D(point1, point2);
-                    Line3D line2 = new Line3D(point1, point3);
-                    Line3D line3 = new Line3D(point3, point4);
-                    Line3D line4 = new Line3D(point2, point4);
+                    Line3D line2 = new Line3D(point2, point4);
+                    Line3D line3 = new Line3D(point4, point3);
+                    Line3D line4 = new Line3D(point3, point1);
                     Polygon3D side1 = new Polygon3D(new List<Line3D>() { line1, line2, line3, line4 });
                     sides.Add(side1);
                 }
 
                 p1 = new Point3D(newX[newX.Count - 1], y[y.Count - 1], newZ[newZ.Count - 1]);
                 p2 = new Point3D(x[x.Count - 1], y[y.Count - 1], z[z.Count - 1]);
-                l1 = new Line3D(pLast, p1);
+                l1 = new Line3D(p1, pLast);
                 l2 = new Line3D(pLast, p2);
-                l3 = new Line3D(p1, p2);
+                l3 = new Line3D(p2, p1);
                 side = new Polygon3D(new List<Line3D>() { l1, l2, l3 });
                 sides.Add(side);
 
@@ -1331,8 +1398,8 @@ namespace AffineTransformations3D
             Point3D lastPoint1 = new Point3D(points[2].X, points[2].Y, 0);
             Point3D lastPoint2 = new Point3D(x[0], y[0], z[0]);
             Line3D lastLine1 = new Line3D(pFirst, lastPoint1);
-            Line3D lastLine2 = new Line3D(pFirst, lastPoint2);
-            Line3D lastLine3 = new Line3D(lastPoint1, lastPoint2);
+            Line3D lastLine2 = new Line3D(lastPoint1, lastPoint2);
+            Line3D lastLine3 = new Line3D(lastPoint2, pFirst);
             Polygon3D lastSide = new Polygon3D(new List<Line3D>() { lastLine1, lastLine2, lastLine3 });
             sides.Add(lastSide);
 
@@ -1343,18 +1410,18 @@ namespace AffineTransformations3D
                 Point3D point3 = new Point3D(x[j], y[j], z[j]);
                 Point3D point4 = new Point3D(x[j + 1], y[j + 1], z[j + 1]);
                 Line3D line1 = new Line3D(point1, point2);
-                Line3D line2 = new Line3D(point1, point3);
-                Line3D line3 = new Line3D(point3, point4);
-                Line3D line4 = new Line3D(point2, point4);
+                Line3D line2 = new Line3D(point2, point4);
+                Line3D line3 = new Line3D(point4, point3);
+                Line3D line4 = new Line3D(point3, point1);
                 Polygon3D side1 = new Polygon3D(new List<Line3D>() { line1, line2, line3, line4 });
                 sides.Add(side1);
             }
 
             lastPoint1 = new Point3D(points[points.Count - 1].X, points[points.Count - 1].Y, 0);
             lastPoint2 = new Point3D(x[x.Count - 1], y[y.Count - 1], z[z.Count - 1]);
-            lastLine1 = new Line3D(pLast, lastPoint1);
+            lastLine1 = new Line3D(lastPoint1, pLast);
             lastLine2 = new Line3D(pLast, lastPoint2);
-            lastLine3 = new Line3D(lastPoint1, lastPoint2);
+            lastLine3 = new Line3D(lastPoint2, lastPoint1);
             lastSide = new Polygon3D(new List<Line3D>() { lastLine1, lastLine2, lastLine3 });
             sides.Add(lastSide);
 
@@ -1363,12 +1430,12 @@ namespace AffineTransformations3D
             if (currentAxonometric)
             {
                 DrawAxisAxonometric();
-                ShowFigure(current.Axonometric(), Color.Black);
+                ShowFigure(current.Axonometric(), Color.Black, remove);
             }
             else
             {
                 DrawAxisPerspective();
-                ShowFigure(current.Perspective(), Color.Black);
+                ShowFigure(current.Perspective(), Color.Black, remove);
             }
         }
 
@@ -1406,8 +1473,8 @@ namespace AffineTransformations3D
                 Point3D p1 = new Point3D(newX[0], newY[0], z[0]);
                 Point3D p2 = new Point3D(x[0], y[0], z[0]);
                 Line3D l1 = new Line3D(pFirst, p1);
-                Line3D l2 = new Line3D(pFirst, p2);
-                Line3D l3 = new Line3D(p1, p2);
+                Line3D l2 = new Line3D(p1, p2);
+                Line3D l3 = new Line3D(p2, pFirst);
                 Polygon3D side = new Polygon3D(new List<Line3D>() { l1, l2, l3 });
                 sides.Add(side);
 
@@ -1418,18 +1485,18 @@ namespace AffineTransformations3D
                     Point3D point3 = new Point3D(x[j], y[j], z[j]);
                     Point3D point4 = new Point3D(x[j + 1], y[j + 1], z[j + 1]);
                     Line3D line1 = new Line3D(point1, point2);
-                    Line3D line2 = new Line3D(point1, point3);
-                    Line3D line3 = new Line3D(point3, point4);
-                    Line3D line4 = new Line3D(point2, point4);
+                    Line3D line2 = new Line3D(point2, point4);
+                    Line3D line3 = new Line3D(point4, point3);
+                    Line3D line4 = new Line3D(point3, point1);
                     Polygon3D side1 = new Polygon3D(new List<Line3D>() { line1, line2, line3, line4 });
                     sides.Add(side1);
                 }
 
                 p1 = new Point3D(newX[newX.Count - 1], newY[newY.Count - 1], z[z.Count - 1]);
                 p2 = new Point3D(x[x.Count - 1], y[y.Count - 1], z[z.Count - 1]);
-                l1 = new Line3D(pLast, p1);
+                l1 = new Line3D(p1, pLast);
                 l2 = new Line3D(pLast, p2);
-                l3 = new Line3D(p1, p2);
+                l3 = new Line3D(p2, p1);
                 side = new Polygon3D(new List<Line3D>() { l1, l2, l3 });
                 sides.Add(side);
 
@@ -1445,8 +1512,8 @@ namespace AffineTransformations3D
             Point3D lastPoint1 = new Point3D(points[2].X, 0, points[2].Y);
             Point3D lastPoint2 = new Point3D(x[0], y[0], z[0]);
             Line3D lastLine1 = new Line3D(pFirst, lastPoint1);
-            Line3D lastLine2 = new Line3D(pFirst, lastPoint2);
-            Line3D lastLine3 = new Line3D(lastPoint1, lastPoint2);
+            Line3D lastLine2 = new Line3D(lastPoint1, lastPoint2);
+            Line3D lastLine3 = new Line3D(lastPoint2, pFirst);
             Polygon3D lastSide = new Polygon3D(new List<Line3D>() { lastLine1, lastLine2, lastLine3 });
             sides.Add(lastSide);
 
@@ -1457,18 +1524,18 @@ namespace AffineTransformations3D
                 Point3D point3 = new Point3D(x[j], y[j], z[j]);
                 Point3D point4 = new Point3D(x[j + 1], y[j + 1], z[j + 1]);
                 Line3D line1 = new Line3D(point1, point2);
-                Line3D line2 = new Line3D(point1, point3);
-                Line3D line3 = new Line3D(point3, point4);
-                Line3D line4 = new Line3D(point2, point4);
+                Line3D line2 = new Line3D(point2, point4);
+                Line3D line3 = new Line3D(point4, point3);
+                Line3D line4 = new Line3D(point3, point1);
                 Polygon3D side1 = new Polygon3D(new List<Line3D>() { line1, line2, line3, line4 });
                 sides.Add(side1);
             }
 
             lastPoint1 = new Point3D(points[points.Count - 1].X, 0, points[points.Count - 1].Y);
             lastPoint2 = new Point3D(x[x.Count - 1], y[y.Count - 1], z[z.Count - 1]);
-            lastLine1 = new Line3D(pLast, lastPoint1);
+            lastLine1 = new Line3D(lastPoint1, pLast);
             lastLine2 = new Line3D(pLast, lastPoint2);
-            lastLine3 = new Line3D(lastPoint1, lastPoint2);
+            lastLine3 = new Line3D(lastPoint2, lastPoint1);
             lastSide = new Polygon3D(new List<Line3D>() { lastLine1, lastLine2, lastLine3 });
             sides.Add(lastSide);
 
@@ -1477,117 +1544,36 @@ namespace AffineTransformations3D
             if (currentAxonometric)
             {
                 DrawAxisAxonometric();
-                ShowFigure(current.Axonometric(), Color.Black);
+                ShowFigure(current.Axonometric(), Color.Black, remove);
             }
             else
             {
                 DrawAxisPerspective();
-                ShowFigure(current.Perspective(), Color.Black);
+                ShowFigure(current.Perspective(), Color.Black, remove);
             }
         }
 
-        private void buttonSave_Click(object sender, EventArgs e)
+        private void checkBoxRemove_CheckedChanged(object sender, EventArgs e)
         {
-            string writePath = "D:/MyPolyhedron.txt";
-            using (StreamWriter sw = new StreamWriter(writePath, false, System.Text.Encoding.Default))
-            {
-                sw.Write("");
-            }
-            using (StreamWriter sw = new StreamWriter(writePath, true, System.Text.Encoding.Default))
-            {
-                foreach (Polygon3D a in current.polygons)
-                {
-                    foreach (Line3D l in a.lines)
-                    {
-                        Point3D p1 = l.first;
-                        double x = p1.x;
-                        double y = p1.y;
-                        double z = p1.z;
-
-                        sw.Write(x);
-                        sw.Write("! ");
-                        sw.Write(y);
-                        sw.Write("! ");
-                        sw.Write(z);
-                        sw.Write("; ");
-
-                        Point3D p2 = l.second;
-                        x = p2.x;
-                        y = p2.y;
-                        z = p2.z;
-
-                        sw.Write(x);
-                        sw.Write("! ");
-                        sw.Write(y);
-                        sw.Write("! ");
-                        sw.Write(z);
-                        sw.Write(";");
-                        sw.WriteLine();
-                    }
-                    sw.WriteLine();
-                    sw.WriteLine('p');
-                    sw.WriteLine();
-                }
-            }
+            CheckBox checkBox = (CheckBox)sender;
+            remove = checkBox.Checked;
         }
 
-        private void buttonLoad_Click(object sender, EventArgs e)
+        private void ShowFigure(Polyhedron3D polyhedron, Color color, bool remove)
         {
-            string readPath = "D:/MyPolyhedron.txt";
-            string text = File.ReadAllText(readPath);
-
-            List<Polygon3D> sides = new List<Polygon3D>();
-            List<Line3D> lines = new List<Line3D>();
-            foreach (string polygon in text.Trim().Split('p'))
+            removed.Clear();
+            if (remove)
             {
-                lines.Clear();
-                string[] points = polygon.Trim().Split(';');
-                for (int i = 0; i < points.Count() - 1; i += 2)
-                {
-                    string[] first = points[i].Trim().Split('!');
-                    string[] second = points[i + 1].Trim().Split('!');
-
-                    double x, y, z, x2, y2, z2;
-                    bool xSuccess = Double.TryParse(first[0], out x);
-                    bool ySuccess = Double.TryParse(first[1], out y);
-                    bool zSuccess = Double.TryParse(first[2], out z);
-
-                    bool x2Success = Double.TryParse(second[0], out x2);
-                    bool y2Success = Double.TryParse(second[1], out y2);
-                    bool z2Success = Double.TryParse(second[2], out z2);
-
-                    if (xSuccess && ySuccess && zSuccess && x2Success && y2Success && z2Success)
-                    {
-                        Point3D p1 = new Point3D(x, y, z);
-                        Point3D p2 = new Point3D(x2, y2, z2);
-                        Line3D l = new Line3D(p1, p2);
-                        lines.Add(l);
-                    }
-                }
-                Polygon3D pol = new Polygon3D(lines);
-                sides.Add(pol);
+                DeleteNotFrontFacingSides();
             }
-
-            current = new Polyhedron3D(sides);
-            g.Clear(SystemColors.Control);
-            if (currentAxonometric)
-            {
-                DrawAxisAxonometric();
-                ShowFigure(current.Axonometric(), Color.Black);
-            }
-            else
-            {
-                DrawAxisPerspective();
-                ShowFigure(current.Perspective(), Color.Black);
-            }
-        }
-
-        private void ShowFigure(Polyhedron3D polyhedron, Color color)
-        {
             Pen pen = new Pen(color);
-            foreach (Polygon3D p in polyhedron.polygons)
+            for (int i = 0; i < polyhedron.polygons.Count(); i++)
             {
-                foreach (Line3D l in p.lines)
+                if (remove && removed.Contains(i))
+                {
+                    continue;
+                }
+                foreach (Line3D l in polyhedron.polygons[i].lines)
                 {
                     g.DrawLine(pen, (int)l.first.x + W, H - (int)l.first.y, (int)l.second.x + W, H - (int)l.second.y);
                 }

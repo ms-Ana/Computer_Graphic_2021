@@ -1635,7 +1635,7 @@ namespace AffineTransformations3D
                 distance += 10;
                 currentCamera.Scale(0.5, 0.5, 0.5);
             }
-            else if (e.KeyCode == Keys.Left)
+            else if (e.KeyCode == Keys.Right)
             {
                 currentCamera.RotateCenter(0, 10, 0);
                 currXAxis.RotateCenter(0, 10, 0);
@@ -1643,7 +1643,7 @@ namespace AffineTransformations3D
                 currZAxis.RotateCenter(0, 10, 0);
                 cameraAngle += 10;
             }
-            else if (e.KeyCode == Keys.Right)
+            else if (e.KeyCode == Keys.Left)
             {
                 currentCamera.RotateCenter(0, -10, 0);
                 currXAxis.RotateCenter(0, -10, 0);
@@ -1704,6 +1704,34 @@ namespace AffineTransformations3D
                     g.DrawLine(pen, (int)l.first.x + W, H - (int)l.first.y, (int)l.second.x + W, H - (int)l.second.y);
                 }
             }
+        }
+
+        private void buttonZBuffer_Click(object sender, EventArgs e)
+        {
+            DrawZBuffer();
+        }
+
+        private void DrawZBuffer()
+        {
+            int[,] buffer = ZBuffer.ZBufferAlgorithm(200, 200, new List<Polyhedron3D> { current });
+            Bitmap bitmap = new Bitmap(200, 200);
+            for (int i = 0; i < 200; i++)
+            {
+                for (int j = 0; j < 200; j++)
+                {
+                    bitmap.SetPixel(i, j, Color.FromArgb(buffer[i, j], buffer[i, j], buffer[i, j]));
+                }
+            }
+
+            var picture = new PictureBox
+            {
+                Name = "pictureBox",
+                Size = new Size(200, 200),
+                Location = new Point(this.Width - 220, this.Height - 220),
+                Image = bitmap,
+
+            };
+            this.Controls.Add(picture);
         }
     }
 
@@ -2262,8 +2290,8 @@ namespace AffineTransformations3D
                     curx1 += slope1;
                     curx2 += slope2;
 
-                    curx_border1 += Convert.ToInt32(curx1);
-                    curx_border2 += Convert.ToInt32(curx1);
+                    curx_border1 = Convert.ToInt32(curx1);
+                    curx_border2 = Convert.ToInt32(curx1);
 
                     z1 = ((line1 - GraphMath3D.EuclideanDist(new Point3D(curx_border1, y, 0), new Point3D(triangle[2].x, height - triangle[2].y, 0))) / line1) * triangle[2].z +
                         ((line1 - GraphMath3D.EuclideanDist(new Point3D(curx_border1, y, 0), new Point3D(triangle[0].x, height - triangle[0].y, 0))) / line1) * triangle[0].z;
@@ -2302,7 +2330,7 @@ namespace AffineTransformations3D
 
             dy2 = dy2 < height ? dy2 + 1 : dy2;
 
-            for (int y = dy1; y < dy2; y++)
+            for (int y = dy1; y < dy2; ++y)
                 for (int x = curx_border1; x <= curx_border2; x++)
                 {
                     var left = Math.Abs(x - curx_border1);

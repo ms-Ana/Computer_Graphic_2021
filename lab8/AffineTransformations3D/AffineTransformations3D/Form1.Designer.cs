@@ -68,6 +68,7 @@ namespace AffineTransformations3D
             this.label13 = new System.Windows.Forms.Label();
             this.checkBoxRemove = new System.Windows.Forms.CheckBox();
             this.buttonCamera = new System.Windows.Forms.Button();
+            this.buttonZBuffer = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonAxonometric
@@ -431,17 +432,28 @@ namespace AffineTransformations3D
             // 
             this.buttonCamera.Location = new System.Drawing.Point(9, 745);
             this.buttonCamera.Name = "buttonCamera";
-            this.buttonCamera.Size = new System.Drawing.Size(195, 31);
+            this.buttonCamera.Size = new System.Drawing.Size(195, 24);
             this.buttonCamera.TabIndex = 43;
             this.buttonCamera.Text = "Камера";
             this.buttonCamera.UseVisualStyleBackColor = true;
             this.buttonCamera.Click += new System.EventHandler(this.buttonCamera_Click);
+            // 
+            // buttonZBuffer
+            // 
+            this.buttonZBuffer.Location = new System.Drawing.Point(9, 775);
+            this.buttonZBuffer.Name = "buttonZBuffer";
+            this.buttonZBuffer.Size = new System.Drawing.Size(195, 23);
+            this.buttonZBuffer.TabIndex = 44;
+            this.buttonZBuffer.Text = "ZBuffer";
+            this.buttonZBuffer.UseVisualStyleBackColor = true;
+            this.buttonZBuffer.Click += new System.EventHandler(this.buttonZBuffer_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 804);
+            this.Controls.Add(this.buttonZBuffer);
             this.Controls.Add(this.buttonCamera);
             this.Controls.Add(this.checkBoxRemove);
             this.Controls.Add(this.label13);
@@ -531,6 +543,7 @@ namespace AffineTransformations3D
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.CheckBox checkBoxRemove;
         private System.Windows.Forms.Button buttonCamera;
+        private System.Windows.Forms.Button buttonZBuffer;
     }
 }
 

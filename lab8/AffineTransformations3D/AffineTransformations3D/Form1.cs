@@ -26,10 +26,16 @@ namespace AffineTransformations3D
 
         private double rotationAngle;
         private int rotation;
-        bool rotating;
+        private bool rotating;
 
         private int rotations = 10;
         private List<Point> points;
+        private int distance;
+        private Polyhedron3D currXAxis;
+        private Polyhedron3D currYAxis;
+        private Polyhedron3D currZAxis;
+        private Polyhedron3D currentCamera;
+        private int cameraAngle;
 
         public Form1()
         {
@@ -51,6 +57,7 @@ namespace AffineTransformations3D
             HideButtons(false);
             points = new List<Point>();
             removed = new List<int>();
+            distance = 100;
         }
 
         private Polyhedron3D Hexahedron(int scale)
@@ -900,11 +907,19 @@ namespace AffineTransformations3D
             ShowFigure(p3.Perspective(), Color.Green, false);
         }
 
-        private void DeleteNotFrontFacingSides()
+        private void DeleteNotFrontFacingSides(bool camera)
         {
             removed.Clear();
             double projX, projY, projZ;
-            if (currentAxonometric)
+            if (camera)
+            {
+                double a = (Math.PI / 180) * cameraAngle;
+                double x = -Math.Sqrt(8);
+                projX = x * Math.Cos(a) - x * Math.Sin(a);
+                projY = 3;
+                projZ = x * Math.Sin(a) + x * Math.Cos(a);
+            }
+            else if (currentAxonometric)
             {
                 projX = -Math.Sqrt(8);
                 projY = 3;
@@ -936,29 +951,12 @@ namespace AffineTransformations3D
                 ny = az * bx - ax * bz;
                 nz = ax * by - ay * bx;
 
-                /*for (int j = 1; j < polygon.lines.Count(); j++)
-                {
-                    double ax = nx;
-                    double ay = ny;
-                    double az = nz;
-
-                    double bx = polygon.lines[j].second.x - polygon.lines[j].first.x;
-                    double by = polygon.lines[j].second.y - polygon.lines[j].first.y;
-                    double bz = polygon.lines[j].second.z - polygon.lines[j].first.z;
-
-                    nx = ay * bz - az * by;
-                    ny = az * bx - ax * bz;
-                    nz = ax * by - ay * bx;
-                }*/
-
                 double cos = (projX * nx + projY * ny + projZ * nz) / 
                     (Math.Sqrt(projX * projX + projY * projY + projZ * projZ) * Math.Sqrt(nx * nx + ny * ny + nz * nz));
                 double arccos = Math.Acos(cos);
                 double angle = (180 / Math.PI) * arccos;
                 if (angle > 90 && angle < 180)
                 {
-                    /*current.polygons.RemoveAt(i);
-                    i--;*/
                     removed.Add(i);
                 }
             }
@@ -1559,12 +1557,140 @@ namespace AffineTransformations3D
             remove = checkBox.Checked;
         }
 
+        private void buttonCamera_Click(object sender, EventArgs e)
+        {
+            if (buttonCamera.BackColor == Color.LightSkyBlue)
+            {
+                buttonCamera.BackColor = SystemColors.ControlLight;
+                KeyDown -= Form1_KeyDown;
+                g.Clear(SystemColors.Control);
+                if (currentAxonometric)
+                {
+                    DrawAxisAxonometric();
+                    ShowFigure(current.Axonometric(), Color.Black, remove);
+                }
+                else
+                {
+                    DrawAxisPerspective();
+                    ShowFigure(current.Perspective(), Color.Black, remove);
+                }
+                return;
+            }
+            else
+            {
+                distance = 100;
+                currentCamera = current.Copy();
+                cameraAngle = 0;
+                Point3D startX = new Point3D(-2000, 0, 0);
+                Point3D startY = new Point3D(0, -2000, 0);
+                Point3D startZ = new Point3D(0, 0, -2000);
+                Point3D x = new Point3D(2000, 0, 0);
+                Point3D y = new Point3D(0, 2000, 0);
+                Point3D z = new Point3D(0, 0, 2000);
+
+                Line3D xAxis = new Line3D(startX, x);
+                Polygon3D s1 = new Polygon3D(new List<Line3D> { xAxis });
+                currXAxis = new Polyhedron3D(new List<Polygon3D> { s1 });
+
+                Line3D yAxis = new Line3D(startY, y);
+                Polygon3D s2 = new Polygon3D(new List<Line3D> { yAxis });
+                currYAxis = new Polyhedron3D(new List<Polygon3D> { s2 });
+
+                Line3D zAxis = new Line3D(startZ, z);
+                Polygon3D s3 = new Polygon3D(new List<Line3D> { zAxis });
+                currZAxis = new Polyhedron3D(new List<Polygon3D> { s3 });
+
+                KeyDown += Form1_KeyDown;
+                buttonCamera.BackColor = Color.LightSkyBlue;
+                g.Clear(SystemColors.Control);
+                if (currentAxonometric)
+                {
+                    ShowFigure(current.Axonometric(), Color.Black, remove);
+                }
+                else
+                {
+                    ShowFigure(current.Perspective(), Color.Black, remove);
+                }
+                return;
+            }
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Up)
+            {
+                if (distance - 10 == 50)
+                {
+                    return;
+                }
+                distance -= 10;
+                currentCamera.Scale(2, 2, 2);
+            }
+            else if (e.KeyCode == Keys.Down)
+            {
+                if (distance + 10 == 170)
+                {
+                    return;
+                }
+                distance += 10;
+                currentCamera.Scale(0.5, 0.5, 0.5);
+            }
+            else if (e.KeyCode == Keys.Left)
+            {
+                currentCamera.RotateCenter(0, 10, 0);
+                currXAxis.RotateCenter(0, 10, 0);
+                currYAxis.RotateCenter(0, 10, 0);
+                currZAxis.RotateCenter(0, 10, 0);
+                cameraAngle += 10;
+            }
+            else if (e.KeyCode == Keys.Right)
+            {
+                currentCamera.RotateCenter(0, -10, 0);
+                currXAxis.RotateCenter(0, -10, 0);
+                currYAxis.RotateCenter(0, -10, 0);
+                currZAxis.RotateCenter(0, -10, 0);
+                cameraAngle -= 10;
+            }
+            else
+            {
+                return;
+            }
+
+            e.Handled = true;
+            g.Clear(SystemColors.Control);
+            //ShowFigureCamera(currXAxis.Axonometric(), Color.Red, false);
+            //ShowFigureCamera(currYAxis.Axonometric(), Color.Blue, false);
+            //ShowFigureCamera(currZAxis.Axonometric(), Color.Green, false);
+            ShowFigureCamera(currentCamera.Axonometric(), Color.Black, true);
+        }
+
         private void ShowFigure(Polyhedron3D polyhedron, Color color, bool remove)
         {
             removed.Clear();
             if (remove)
             {
-                DeleteNotFrontFacingSides();
+                DeleteNotFrontFacingSides(false);
+            }
+            Pen pen = new Pen(color);
+            for (int i = 0; i < polyhedron.polygons.Count(); i++)
+            {
+                if (remove && removed.Contains(i))
+                {
+                    continue;
+                }
+                foreach (Line3D l in polyhedron.polygons[i].lines)
+                {
+                    g.DrawLine(pen, (int)l.first.x + W, H - (int)l.first.y, (int)l.second.x + W, H - (int)l.second.y);
+                }
+            }
+        }
+
+        private void ShowFigureCamera(Polyhedron3D polyhedron, Color color, bool remove)
+        {
+            removed.Clear();
+            if (remove)
+            {
+                DeleteNotFrontFacingSides(true);
             }
             Pen pen = new Pen(color);
             for (int i = 0; i < polyhedron.polygons.Count(); i++)
@@ -1715,6 +1841,32 @@ namespace AffineTransformations3D
                 res.polygons.Add(new Polygon3D(lines));
             }
 
+            return res;
+        }
+
+        public Polyhedron3D Copy()
+        {
+            Polyhedron3D res = new Polyhedron3D();
+            foreach (Polygon3D polygon in polygons)
+            {
+                List<Line3D> lines = new List<Line3D>();
+                foreach (Line3D line in polygon.lines)
+                {
+                    double x = line.first.x;
+                    double y = line.first.y;
+                    double z = line.first.z;
+                    Point3D first = new Point3D(x, y, z);
+
+                    x = line.second.x;
+                    y = line.second.y;
+                    z = line.second.z;
+                    Point3D second = new Point3D(x, y, z);
+                    Line3D l = new Line3D(first, second);
+                    lines.Add(l);
+                }
+                Polygon3D p = new Polygon3D(lines);
+                res.polygons.Add(p);
+            }
             return res;
         }
 

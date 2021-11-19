@@ -1596,6 +1596,7 @@ namespace AffineTransformations3D
     }
 
     public delegate double callable(double x, double y);
+
     public class Point3D
     {
         public double x { get; set; }

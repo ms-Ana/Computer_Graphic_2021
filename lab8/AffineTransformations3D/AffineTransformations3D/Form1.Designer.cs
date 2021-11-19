@@ -79,7 +79,7 @@ namespace AffineTransformations3D
             this.buttonAxonometric.TabIndex = 0;
             this.buttonAxonometric.Text = "Аксонометрическая проекция";
             this.buttonAxonometric.UseVisualStyleBackColor = true;
-            this.buttonAxonometric.Click += new System.EventHandler(this.buttonHexahedron_Click);
+            this.buttonAxonometric.Click += new System.EventHandler(this.buttonAxonometric_Click);
             // 
             // buttonPerspective
             // 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 namespace AffineTransformations3D
@@ -17,11 +18,17 @@ namespace AffineTransformations3D
             return ConvertCosToBrightness(cos);
         }
 
-        private static void CalculateShading(Polyhedron3D polyhedron, Point3D point)
+        private static void Shading(Polyhedron3D polyhedron, Point3D point)
         {
-            Dictionary<int, Point3D> pointsnormal;
+            Dictionary<int, Point3D> pointsnormal = new Dictionary<int, Point3D>();
 
 
+
+        }
+
+        public static Bitmap Gourand()
+        {
+            return new Bitmap(100,100);
         }
     }
 }

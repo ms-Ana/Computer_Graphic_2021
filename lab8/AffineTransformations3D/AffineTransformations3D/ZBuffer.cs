@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Drawing;
 using System.Linq;
 
 namespace AffineTransformations3D
 {
     class ZBuffer
     {
-        public static int[,] ZBufferAlgorithm(int width, int height, List<Polyhedron3D> polyhedron3Ds)
+        public static Bitmap ZBufferAlgorithm(int width, int height, List<Polyhedron3D> polyhedron3Ds)
         {
-            int[,] result = new int[height, width];
+            Bitmap result = new Bitmap(width, height);
             double[,] buff = new double[height, width];
             for (int i = 0; i < height; i++)
                 for (int j = 0; j < width; j++)
-                    result[i, j] = 255;
+                    result.SetPixel(i, j, Color.White);
             for (int i = 0; i < height; i++)
                 for (int j = 0; j < width; j++)
                     buff[i, j] = double.MinValue;
@@ -21,31 +22,39 @@ namespace AffineTransformations3D
             foreach (var polyhedron in polyhedron3Ds)
                 rasterizedPolyhedrons.Add(Rasterize(polyhedron, width, height));
 
-            foreach (var rasterizedPolyhedron in rasterizedPolyhedrons)
+            List<List<Color>> colors = new List<List<Color>>();
+            foreach (var polyhedron in polyhedron3Ds)
+                colors.Add(Colorize(polyhedron));
+
+            Point3D center = new Point3D(width / 2, height / 2, 0);
+
+            for (int i = 0; i < rasterizedPolyhedrons.Count; i++)
             {
-                foreach (var rasterizedPolygon in rasterizedPolyhedron)
-                    foreach (var point in rasterizedPolygon)
+                for (int j = 0; j < rasterizedPolyhedrons[i].Count; j++)
+                    foreach (var point in rasterizedPolyhedrons[i][j])
                     {
-                        int x = (int)point.x;
-                        int y = (int)point.y;
+                        int x = (int)(point.x + center.x);
+                        int y = (int)(point.y + center.y);
                         if (x < width && x > 0 && y < height && y > 0)
                             if (point.z > buff[x, y])
+                            {
                                 buff[x, y] = point.z;
+                                result.SetPixel(x, y, colors[i][j]);
+                            }
                     }
 
             }
-            var minRange = GraphMath3D.Min2D(buff);
-            var maxRange = GraphMath3D.Max2D(buff);
-            var range = maxRange - minRange;
-            for (int i = 0; i < buff.GetLength(0); i++)
-            {
-                for (int j = 0; j < buff.GetLength(1); j++)
-                    result[i, j] = (int)((buff[i, j] - minRange) * 255 / range);
-            }
+
             return result;
         }
-
-
+        public static List<Color> Colorize(Polyhedron3D polyhedron)
+        {
+            List<Color> colors = new List<Color>();
+            Random randomGen = new Random();
+            for (int i = 0; i < polyhedron.polygons.Count(); i++)
+                colors.Add(Color.FromArgb(randomGen.Next(255), randomGen.Next(255), randomGen.Next(255)));
+            return colors;
+        }
         private static List<List<Point3D>> Rasterize(Polyhedron3D polyhedron, int width, int height)
         {
             List<List<Point3D>> rasterizedPolyhedron = new List<List<Point3D>>();
@@ -78,137 +87,62 @@ namespace AffineTransformations3D
                 resultPoints.Add(line.first);
             return resultPoints;
         }
+       
         private static List<Point3D> RasterizeTriangle(List<Point3D> point3Ds, int width, int height)
         {
             List<Point3D> rasterizedTriangle = new List<Point3D>();
-            var triangle = point3Ds.OrderBy(point => -point.y).ToList();
+            var triangle = point3Ds.OrderBy(point => point.y).ToList();
 
-            if (triangle[0].y == triangle[1].y)
-                return RasterizeTopTriangle(point3Ds, width, height);
-            else if (triangle[1].y == triangle[2].y)
-                return RasterizeBottomTriangle(point3Ds, width, height);
-            else
+            var x01s = Interpolate(triangle[0].y, triangle[0].x, triangle[1].y, triangle[1].x);
+            var x12s = Interpolate(triangle[1].y, triangle[1].x, triangle[2].y, triangle[2].x);
+            var x02s = Interpolate(triangle[0].y, triangle[0].x, triangle[2].y, triangle[2].x);
+
+            var z01s = Interpolate(triangle[0].y, triangle[0].z, triangle[1].y, triangle[1].z);
+            var z12s = Interpolate(triangle[1].y, triangle[1].z, triangle[2].y, triangle[2].z);
+            var z02s = Interpolate(triangle[0].y, triangle[0].z, triangle[2].y, triangle[2].z);
+
+            x01s.RemoveAt(x01s.Count - 1);
+            z01s.RemoveAt(z01s.Count - 1);
+
+            var x012s = x01s.Concat(x12s).ToList();
+            var z012s = z01s.Concat(z12s).ToList();
+
+            int middle = x012s.Count / 2;
+            List<int> lX = x02s[middle] < x012s[middle] ? x02s : x012s,
+                      rX = x02s[middle] < x012s[middle] ? x012s : x02s,
+                      lZ = x02s[middle] < x012s[middle] ? z02s : z012s,
+                      rZ = x02s[middle] < x012s[middle] ? z012s : z02s;
+
+            int y0 = (int)triangle[0].y, y2 = (int)triangle[2].y;
+            for (int i = 0; i <= y2 - y0; i++)
             {
-                var x = (triangle[0].x + ((triangle[1].y - triangle[0].y) / (triangle[2].y - triangle[0].y))) * (triangle[2].x - triangle[0].x);
-                var point = new Point3D(x, triangle[1].y, 0);
-                var left = GraphMath3D.EuclideanDist(point, triangle[0]);
-                var right = GraphMath3D.EuclideanDist(point, triangle[2]);
-                var length = left + right + 1e-9;
-                var z = right / length * triangle[0].z + left / length * triangle[2].z;
-
-                var top_triangle = RasterizeTopTriangle(new List<Point3D> { triangle[1], point, triangle[2] }, width, height);
-                var bottom_triangle = RasterizeBottomTriangle(new List<Point3D> { triangle[0], triangle[1], point }, width, height);
-
-                return top_triangle.Concat(bottom_triangle).ToList();
-
-
+                int curxL = lX[i], curxR = rX[i];
+                var currZ = Interpolate(curxL, lZ[i], curxR, rZ[i]);
+                for (int x = curxL; x < curxR; x++)
+                    rasterizedTriangle.Add(new Point3D(x, (y0 + i), currZ[x - curxL]));
             }
-        }
 
-        private static List<Point3D> RasterizeTopTriangle(List<Point3D> point3Ds, int width, int height)
-        {
-            List<Point3D> rasterizedTriangle = new List<Point3D>();
-            var triangle = point3Ds.OrderBy(point => -point.y).ToList();
-            if (triangle[0].x > triangle[1].x)
-            {
-                var temp = triangle[0];
-                triangle[0] = triangle[1];
-                triangle[1] = temp;
-            }
-            int dy1 = Convert.ToInt32(height - triangle[2].y),
-                dy2 = Convert.ToInt32(height - triangle[0].y);
-            double slope1 = (triangle[2].x - triangle[0].x) / (triangle[2].y - triangle[0].y),
-                   slope2 = (triangle[2].x - triangle[1].x) / (triangle[2].y - triangle[1].y);
-
-            var line1 = GraphMath3D.EuclideanDist(triangle[2], triangle[0]);
-            var line2 = GraphMath3D.EuclideanDist(triangle[2], triangle[1]);
-
-            var curx1 = triangle[2].x;
-            var curx2 = curx1;
-
-            var curx_border1 = curx1;
-            var curx_border2 = curx2;
-
-            var z1 = triangle[2].z;
-            var z2 = triangle[2].z;
-
-            dy2 = dy2 > 0 ? dy2 - 1 : dy2;
-            for (var y = dy1; y > dy2; --y)
-            {
-                for (var x = curx_border1; x <= curx_border2; x++)
-                {
-                    var left = Math.Abs(x - curx_border1);
-                    var right = Math.Abs(curx_border2 - x);
-                    var length = left + right + 1e+9;
-                    rasterizedTriangle.Add(new Point3D(x, y, right / length * z1 + left / length * z2));
-                }
-
-                curx1 += slope1;
-                curx2 += slope2;
-
-                curx_border1 = Convert.ToInt32(curx1);
-                curx_border2 = Convert.ToInt32(curx1);
-
-                z1 = ((line1 - GraphMath3D.EuclideanDist(new Point3D(curx_border1, y, 0), new Point3D(triangle[2].x, height - triangle[2].y, 0))) / line1) * triangle[2].z +
-                    ((line1 - GraphMath3D.EuclideanDist(new Point3D(curx_border1, y, 0), new Point3D(triangle[0].x, height - triangle[0].y, 0))) / line1) * triangle[0].z;
-                z2 = ((line2 - GraphMath3D.EuclideanDist(new Point3D(curx_border2, y, 0), new Point3D(triangle[2].x, height - triangle[2].y, 0))) / line2) * triangle[2].z
-                    + ((line2 - GraphMath3D.EuclideanDist(new Point3D(curx_border2, y, 0), new Point3D(triangle[1].x, height - triangle[1].y, 0))) / line2) * triangle[1].z;
-            }
             return rasterizedTriangle;
         }
-        private static List<Point3D> RasterizeBottomTriangle(List<Point3D> point3Ds, int width, int height)
+
+        private static List<int> Interpolate(double cord1Start, double cord2Start, double cord1End, double cord2End)
         {
-            List<Point3D> rasterizedTriangle = new List<Point3D>();
-            var triangle = point3Ds.OrderBy(point => -point.y).ToList();
-            if (triangle[1].x > triangle[2].x)
+            int cord1StartI = (int)cord1Start, cord1EndI = (int)cord1End;
+            if (cord1Start == cord1End)
+                return new List<int> { (int)cord2Start };
+
+            List<int> result = new List<int>();
+
+            var slope = (cord2End - cord2Start) / (cord1End - cord1Start);
+            double curx = cord2Start;
+            for (int i = cord1StartI; i <= cord1EndI; i++)
             {
-                var temp = triangle[1];
-                triangle[1] = triangle[2];
-                triangle[2] = temp;
+                result.Add((int)curx);
+                curx += slope;
             }
-            int dy1 = Convert.ToInt32(height - triangle[0].y),
-                dy2 = Convert.ToInt32(height - triangle[1].y);
 
-            var slope1 = (triangle[1].x - triangle[0].x) / (triangle[1].y - triangle[0].y);
-            var slope2 = (triangle[2].x - triangle[0].x) / (triangle[2].y - triangle[0].y);
-
-            var line1 = GraphMath3D.EuclideanDist(triangle[0], triangle[1]);
-            var line2 = GraphMath3D.EuclideanDist(triangle[0], triangle[2]);
-
-            var curx1 = triangle[0].x;
-            var curx2 = triangle[0].x;
-
-            var curx_border1 = Convert.ToInt32(curx1);
-            var curx_border2 = Convert.ToInt32(curx2);
-
-            var z1 = triangle[0].z;
-            var z2 = triangle[0].z;
-
-            dy2 = dy2 < height ? dy2 + 1 : dy2;
-
-            for (int y = dy1; y < dy2; ++y)
-            {
-                for (int x = curx_border1; x <= curx_border2; x++)
-                {
-                    var left = Math.Abs(x - curx_border1);
-                    var right = Math.Abs(curx_border2 - x);
-                    var length = left + right + 1e-9;
-
-                    rasterizedTriangle.Add(new Point3D(x, y, right / length * z1 + left / length * z2));
-                }
-
-                curx1 -= slope1;
-                curx2 -= slope2;
-
-                curx_border1 = Convert.ToInt32(curx1);
-                curx_border2 = Convert.ToInt32(curx2);
-
-                z1 = ((line1 - GraphMath3D.EuclideanDist(new Point3D(curx_border1, y, 0), new Point3D(triangle[0].x, height - triangle[0].y, 0))) / line1) * triangle[0].z +
-                   ((line1 - GraphMath3D.EuclideanDist(new Point3D(curx_border1, y, 0), new Point3D(triangle[1].x, height - triangle[1].y, 0))) / line1) * triangle[1].z;
-                z2 = ((line2 - GraphMath3D.EuclideanDist(new Point3D(curx_border2, y, 0), new Point3D(triangle[0].x, height - triangle[0].y, 0))) / line2) * triangle[0].z
-                    + ((line2 - GraphMath3D.EuclideanDist(new Point3D(curx_border2, y, 0), new Point3D(triangle[2].x, height - triangle[2].y, 0))) / line2) * triangle[2].z;
-            }
-            return rasterizedTriangle;
+            return result;
         }
+
     }
 }

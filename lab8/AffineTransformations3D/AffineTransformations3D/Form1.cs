@@ -57,8 +57,8 @@ namespace AffineTransformations3D
             picture = new PictureBox
             {
                 Name = "pictureBox",
-                Size = new Size(200, 200),
-                Location = new Point(this.Width - 220, this.Height - 240)
+                Size = new Size(400, 400),
+                Location = new Point(this.Width - 420, this.Height - 440)
 
             };
             this.Controls.Add(picture);
@@ -701,23 +701,7 @@ namespace AffineTransformations3D
 
         private void DrawZBuffer()
         {
-            int[,] buffer = ZBuffer.ZBufferAlgorithm(200, 200, new List<Polyhedron3D> { current.Axonometric() });
-            Bitmap bitmap = new Bitmap(200, 200);
-            for (int i = 0; i < 200; i++)
-            {
-                for (int j = 0; j < 200; j++)
-                {
-                    if (buffer[i, j] < 0)
-                    {
-                        bitmap.SetPixel(i, j, Color.FromArgb(255, 255, 255));
-                    }
-                    else
-                    {
-                        bitmap.SetPixel(i, j, Color.FromArgb(buffer[i, j], buffer[i, j], buffer[i, j]));
-                    }
-                }
-            }
-
+            Bitmap bitmap = ZBuffer.ZBufferAlgorithm(400, 400, new List<Polyhedron3D> { current.Axonometric() });
             picture.Image = bitmap;
             picture.Visible = true;
         }

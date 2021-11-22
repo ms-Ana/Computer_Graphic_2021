@@ -173,6 +173,22 @@ namespace AffineTransformations3D
                 resultPoints.Add(line.first);
             return resultPoints;
         }
+
+        public static Dictionary<Point3D, List<int>> PolyhedronToPoints(Polyhedron3D polyhedron)
+        {
+            Dictionary<Point3D, List<int>> points2polygons = new Dictionary<Point3D, List<int>>();
+            for (int i = 0; i < polyhedron.polygons.Count; i++)
+            {
+                foreach (var line in polyhedron.polygons[i].lines)
+                {
+                    if (!points2polygons.ContainsKey(line.first))
+                        points2polygons[line.first] = new List<int>();
+                    points2polygons[line.first].Add(i);  
+                }
+            }
+            return points2polygons;
+
+        }
         public static List<List<Point3D>> Rasterize(Polyhedron3D polyhedron, int width, int height)
         {
             List<List<Point3D>> rasterizedPolyhedron = new List<List<Point3D>>();

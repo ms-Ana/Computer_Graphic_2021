@@ -243,12 +243,12 @@ namespace AffineTransformations3D
             return rasterizedTriangle;
         }
 
-        public static List<List<Tuple<Point3D, Point3D>>> RasterizeWithLight(Polyhedron3D polyhedron, int width, int height, Dictionary<Point3D, double> points2Lights)
+        public static List<List<Tuple<Point3D, double>>> RasterizeWithLight(Polyhedron3D polyhedron, int width, int height, Dictionary<Point3D, double> points2Lights)
         {
-            List<List<Tuple<Point3D, Point3D>>> rasterizedPolyhedron = new List<List<Tuple<Point3D, Point3D>>>();
+            List<List<Tuple<Point3D, double>>> rasterizedPolyhedron = new List<List<Tuple<Point3D, double>>>();
             foreach (var polygon in polyhedron.polygons)
             {
-                List<Tuple<Point3D, Point3D>> rasterizedPolygon = new List<Tuple<Point3D, Point3D>>();
+                List<Tuple<Point3D, double>> rasterizedPolygon = new List<Tuple<Point3D, double>>();
                 var polygonPoints = PolygonToPoints(polygon);
                 var triangles = Triangulate(polygonPoints);
                 foreach (var triangle in triangles)
@@ -259,9 +259,9 @@ namespace AffineTransformations3D
             return rasterizedPolyhedron;
         }
 
-        private static List<Tuple<Point3D, Point3D>> RasterizeTriangleWithLight(List<Point3D> point3Ds, int width, int height, Dictionary<Point3D, double> points2Lights)
+        private static List<Tuple<Point3D, double>> RasterizeTriangleWithLight(List<Point3D> point3Ds, int width, int height, Dictionary<Point3D, double> points2Lights)
         {
-            List<Point3D> rasterizedTriangle = new List<Point3D>();
+            List<Tuple<Point3D, double>> rasterizedTriangle = new List<Tuple<Point3D, double>>();
             var triangle = point3Ds.OrderBy(point => point.y).ToList();
 
             var x01s = Interpolate(triangle[0].y, triangle[0].x, triangle[1].y, triangle[1].x);
@@ -272,25 +272,35 @@ namespace AffineTransformations3D
             var z12s = Interpolate(triangle[1].y, triangle[1].z, triangle[2].y, triangle[2].z);
             var z02s = Interpolate(triangle[0].y, triangle[0].z, triangle[2].y, triangle[2].z);
 
+            var h01s = Interpolate(triangle[0].y, points2Lights[triangle[0]], triangle[1].y, points2Lights[triangle[1]]);
+            var h12s = Interpolate(triangle[1].y, points2Lights[triangle[1]], triangle[2].y, points2Lights[triangle[2]]);
+            var h02s = Interpolate(triangle[0].y, points2Lights[triangle[0]], triangle[2].y, points2Lights[triangle[2]]);
+
             x01s.RemoveAt(x01s.Count - 1);
             z01s.RemoveAt(z01s.Count - 1);
+            h01s.RemoveAt(h01s.Count - 1);
 
             var x012s = x01s.Concat(x12s).ToList();
             var z012s = z01s.Concat(z12s).ToList();
+            var h012s = h01s.Concat(h12s).ToList();
 
             int middle = x012s.Count / 2;
             List<int> lX = x02s[middle] < x012s[middle] ? x02s : x012s,
                       rX = x02s[middle] < x012s[middle] ? x012s : x02s,
                       lZ = x02s[middle] < x012s[middle] ? z02s : z012s,
-                      rZ = x02s[middle] < x012s[middle] ? z012s : z02s;
+                      rZ = x02s[middle] < x012s[middle] ? z012s : z02s,
+                      lH = x02s[middle] < x012s[middle] ? h02s : h012s,
+                      rH = x02s[middle] < x012s[middle] ? h012s : h02s;
+
 
             int y0 = (int)triangle[0].y, y2 = (int)triangle[2].y;
             for (int i = 0; i <= y2 - y0; i++)
             {
                 int curxL = lX[i], curxR = rX[i];
                 var currZ = Interpolate(curxL, lZ[i], curxR, rZ[i]);
+                var currH = Interpolate(curxL, lH[i], curxR, rH[i]);
                 for (int x = curxL; x < curxR; x++)
-                    rasterizedTriangle.Add(new Point3D(x, (y0 + i), currZ[x - curxL]));
+                    rasterizedTriangle.Add(Tuple.Create(new Point3D(x, y0 + i, currZ[x - curxL]), (double)currH[x -curxL]));
             }
 
             return rasterizedTriangle;

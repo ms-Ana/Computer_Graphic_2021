@@ -65,18 +65,21 @@ namespace AffineTransformations3D
                     buff[i, j] = double.MinValue;
 
 
-            List<List<Point3D>> rasterizedPolyhedron = GraphMath3D.Rasterize(polyhedron, width, height);
+            var rasterizedPolyhedron = GraphMath3D.RasterizeWithLight(polyhedron, width, height, points2Lights);
             Point3D center = new Point3D(width / 2, height / 2, 0);
             for (int i = 0; i < rasterizedPolyhedron.Count; i++)
                 foreach (var point in rasterizedPolyhedron[i])
                 {
-                    int x = (int)(point.x + center.x);
-                    int y = (int)(point.y + center.y);
+                    int x = (int)(point.Item1.x + center.x);
+                    int y = (int)(point.Item1.y + center.y);
                     if (x < width && x > 0 && y < height && y > 0)
-                        if (point.z > buff[x, y])
+                        if (point.Item1.z > buff[x, y])
                         {
-                            buff[x, y] = point.z;
-                            //bitmap.SetPixel(x, y, Color.FromArgb((int)(color.R * points2Lights[poi), (int)(color.G * point.illumination), (int)(color.B * point.illumination)));
+                            buff[x, y] = point.Item1.z;
+                            int red = (int)(color.R * point.Item2) > 255 ? 255 : (int)(color.R * point.Item2);
+                            int green = (int)(color.G * point.Item2) > 255 ? 255 : (int)(color.G * point.Item2);
+                            int blue = (int)(color.B * point.Item2) > 255 ? 255 : (int)(color.B * point.Item2);
+                            bitmap.SetPixel(x, y, Color.FromArgb(red, green, blue));
                         }
                 }
             return bitmap;

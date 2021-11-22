@@ -48,6 +48,7 @@ namespace AffineTransformations3D
             return new Point3D(nx, ny, nz);
         }
 
+        
 
         public static double[,] MatrixMultiplication(double[,] leftMatrix, double[,] rightMatrix)
         {

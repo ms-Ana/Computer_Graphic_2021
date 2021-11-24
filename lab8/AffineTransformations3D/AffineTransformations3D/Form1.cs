@@ -20,8 +20,10 @@ namespace AffineTransformations3D
 
         private bool currentAxonometric;
         private Polyhedron3D current;
+        private List<Polyhedron3D> currentFigures;
+        private bool add;
         private List<int> removed;
-        bool remove = true;
+        private bool remove = true;
 
         private double rotationAngle;
         private int rotation;
@@ -53,6 +55,8 @@ namespace AffineTransformations3D
             SolidsOfRevolution.points = new List<Point>();
             removed = new List<int>();
             distance = 100;
+            currentFigures = new List<Polyhedron3D>();
+            add = false;
 
             picture = new PictureBox
             {
@@ -113,6 +117,21 @@ namespace AffineTransformations3D
                 default:
                     break;
             }
+            if (add)
+            {
+                currentFigures.RemoveAt(currentFigures.Count() - 1);
+                currentFigures.Add(current.Copy());
+                currentFigures.Add(p);
+                add = false;
+            }
+            else
+            {
+                currentFigures.Clear();
+            }
+            if (currentFigures.Count() == 0)
+            {
+                currentFigures.Add(p);
+            }
             current = p;
 
             buttonAxonometric.Visible = true;
@@ -121,42 +140,42 @@ namespace AffineTransformations3D
 
 
         // Draw figure on screen
-        private void ShowFigure(Polyhedron3D polyhedron, Color color, bool remove)
+        private void ShowFigure(Polyhedron3D polyhedron, Polyhedron3D projection, Color color, bool remove)
         {
             removed.Clear();
             if (remove)
             {
-                DeleteNotFrontFacingSides(false);
+                DeleteNotFrontFacingSides(polyhedron, false);
             }
             Pen pen = new Pen(color);
-            for (int i = 0; i < polyhedron.polygons.Count(); i++)
+            for (int i = 0; i < projection.polygons.Count(); i++)
             {
                 if (remove && removed.Contains(i))
                 {
                     continue;
                 }
-                foreach (Line3D l in polyhedron.polygons[i].lines)
+                foreach (Line3D l in projection.polygons[i].lines)
                 {
                     g.DrawLine(pen, (int)l.first.x + W, H - (int)l.first.y, (int)l.second.x + W, H - (int)l.second.y);
                 }
             }
         }
 
-        private void ShowFigureCamera(Polyhedron3D polyhedron, Color color, bool remove)
+        private void ShowFigureCamera(Polyhedron3D polyhedron, Polyhedron3D projection, Color color, bool remove)
         {
             removed.Clear();
             if (remove)
             {
-                DeleteNotFrontFacingSides(true);
+                DeleteNotFrontFacingSides(polyhedron, true);
             }
             Pen pen = new Pen(color);
-            for (int i = 0; i < polyhedron.polygons.Count(); i++)
+            for (int i = 0; i < projection.polygons.Count(); i++)
             {
                 if (remove && removed.Contains(i))
                 {
                     continue;
                 }
-                foreach (Line3D l in polyhedron.polygons[i].lines)
+                foreach (Line3D l in projection.polygons[i].lines)
                 {
                     g.DrawLine(pen, (int)l.first.x + W, H - (int)l.first.y, (int)l.second.x + W, H - (int)l.second.y);
                 }
@@ -169,12 +188,18 @@ namespace AffineTransformations3D
             if (currentAxonometric)
             {
                 DrawAxisAxonometric();
-                ShowFigure(current.Axonometric(), Color.Black, remove);
+                foreach (Polyhedron3D polyhedron in currentFigures)
+                {
+                    ShowFigure(polyhedron, polyhedron.Axonometric(), Color.Black, remove);
+                }
             }
             else
             {
                 DrawAxisPerspective();
-                ShowFigure(current.Perspective(), Color.Black, remove);
+                foreach (Polyhedron3D polyhedron in currentFigures)
+                {
+                    ShowFigure(polyhedron, polyhedron.Perspective(), Color.Black, remove);
+                }
             }
         }
 
@@ -192,17 +217,17 @@ namespace AffineTransformations3D
             Line3D xAxis = new Line3D(startX, x);
             Polygon3D s1 = new Polygon3D(new List<Line3D> { xAxis });
             Polyhedron3D p1 = new Polyhedron3D(new List<Polygon3D> { s1 });
-            ShowFigure(p1.Axonometric(), Color.Red, false);
+            ShowFigure(p1, p1.Axonometric(), Color.Red, false);
 
             Line3D yAxis = new Line3D(startY, y);
             Polygon3D s2 = new Polygon3D(new List<Line3D> { yAxis });
             Polyhedron3D p2 = new Polyhedron3D(new List<Polygon3D> { s2 });
-            ShowFigure(p2.Axonometric(), Color.Blue, false);
+            ShowFigure(p2, p2.Axonometric(), Color.Blue, false);
 
             Line3D zAxis = new Line3D(startZ, z);
             Polygon3D s3 = new Polygon3D(new List<Line3D> { zAxis });
             Polyhedron3D p3 = new Polyhedron3D(new List<Polygon3D> { s3 });
-            ShowFigure(p3.Axonometric(), Color.Green, false);
+            ShowFigure(p2, p3.Axonometric(), Color.Green, false);
         }
 
         private void DrawAxisPerspective()
@@ -217,17 +242,17 @@ namespace AffineTransformations3D
             Line3D xAxis = new Line3D(startX, x);
             Polygon3D s1 = new Polygon3D(new List<Line3D> { xAxis });
             Polyhedron3D p1 = new Polyhedron3D(new List<Polygon3D> { s1 });
-            ShowFigure(p1.Perspective(), Color.Red, false);
+            ShowFigure(p1, p1.Perspective(), Color.Red, false);
 
             Line3D yAxis = new Line3D(startY, y);
             Polygon3D s2 = new Polygon3D(new List<Line3D> { yAxis });
             Polyhedron3D p2 = new Polyhedron3D(new List<Polygon3D> { s2 });
-            ShowFigure(p2.Perspective(), Color.Blue, false);
+            ShowFigure(p2, p2.Perspective(), Color.Blue, false);
 
             Line3D zAxis = new Line3D(startZ, z);
             Polygon3D s3 = new Polygon3D(new List<Line3D> { zAxis });
             Polyhedron3D p3 = new Polyhedron3D(new List<Polygon3D> { s3 });
-            ShowFigure(p3.Perspective(), Color.Green, false);
+            ShowFigure(p3, p3.Perspective(), Color.Green, false);
         }
 
 
@@ -562,25 +587,73 @@ namespace AffineTransformations3D
 
         private void buttonX_Click(object sender, EventArgs e)
         {
-            current = SolidsOfRevolution.CreateParallelToXAxis();
+            Polyhedron3D p = SolidsOfRevolution.CreateParallelToXAxis();
+            if (add)
+            {
+                currentFigures.RemoveAt(currentFigures.Count() - 1);
+                currentFigures.Add(current.Copy());
+                currentFigures.Add(p);
+                add = false;
+            }
+            else
+            {
+                currentFigures.Clear();
+            }
+            if (currentFigures.Count() == 0)
+            {
+                currentFigures.Add(p);
+            }
+            current = p;
             ShowFigureWithAxis();
         }
 
         private void buttonY_Click(object sender, EventArgs e)
         {
-            current = SolidsOfRevolution.CreateParallelToYAxis();
+            Polyhedron3D p = SolidsOfRevolution.CreateParallelToYAxis();
+            if (add)
+            {
+                currentFigures.RemoveAt(currentFigures.Count() - 1);
+                currentFigures.Add(current.Copy());
+                currentFigures.Add(p);
+                add = false;
+            }
+            else
+            {
+                currentFigures.Clear();
+            }
+            if (currentFigures.Count() == 0)
+            {
+                currentFigures.Add(p);
+            }
+            current = p;
             ShowFigureWithAxis();
         }
 
         private void buttonZ_Click(object sender, EventArgs e)
         {
-            current = SolidsOfRevolution.CreateParallelToZAxis();
+            Polyhedron3D p = SolidsOfRevolution.CreateParallelToZAxis();
+            if (add)
+            {
+                currentFigures.RemoveAt(currentFigures.Count() - 1);
+                currentFigures.Add(current.Copy());
+                currentFigures.Add(p);
+                add = false;
+            }
+            else
+            {
+                currentFigures.Clear();
+            }
+            if (currentFigures.Count() == 0)
+            {
+                currentFigures.Add(p);
+            }
+            current = p;
             ShowFigureWithAxis();
         }
 
 
         // Deleting not front-facing sides
-        private void DeleteNotFrontFacingSides(bool camera)
+        private void DeleteNotFrontFacingSides(Polyhedron3D p, bool camera)
         {
             removed.Clear();
             double projX, projY, projZ;
@@ -605,9 +678,9 @@ namespace AffineTransformations3D
                 projZ = 1;
             }
 
-            for (int i = 0; i < current.polygons.Count(); i++)
+            for (int i = 0; i < p.polygons.Count(); i++)
             {
-                Polygon3D polygon = current.polygons[i];
+                Polygon3D polygon = p.polygons[i];
                 Point3D normal = GraphMath3D.CalculateNormal(polygon);
 
                 double cos = (projX * normal.x + projY * normal.y + projZ * normal.z) /
@@ -689,22 +762,55 @@ namespace AffineTransformations3D
 
             e.Handled = true;
             g.Clear(SystemColors.Control);
-            ShowFigureCamera(currentCamera.Axonometric(), Color.Black, true);
+            ShowFigureCamera(currentCamera, currentCamera.Axonometric(), Color.Black, true);
         }
 
         
         // ZBuffer
         private void buttonZBuffer_Click(object sender, EventArgs e)
         {
-            DrawZBuffer();
-        }
+            List<Polyhedron3D> polyhedrons = new List<Polyhedron3D>();
+            foreach (Polyhedron3D p in FixPointsForZBuffer())
+            {
+                polyhedrons.Add(p.Copy().Axonometric());
+            }
 
-        private void DrawZBuffer()
-        {
-            Bitmap bitmap = ZBuffer.ZBufferAlgorithm(400, 400, new List<Polyhedron3D> { current.Axonometric() });
+            Bitmap bitmap = ZBuffer.ZBufferAlgorithm(400, 400, polyhedrons);
             picture.Image = bitmap;
             picture.Visible = true;
         }
+
+        private void buttonAdd_Click(object sender, EventArgs e)
+        {
+            add = true;
+        }
+
+        private List<Polyhedron3D> FixPointsForZBuffer()
+        {
+            List<Polyhedron3D> res = new List<Polyhedron3D>();
+            foreach (Polyhedron3D polyhedron in currentFigures)
+            {
+                Polyhedron3D newPolyhedron = polyhedron.Copy();
+                newPolyhedron.FixPointsForBitmap();
+                res.Add(newPolyhedron);
+            }
+            return res;
+        }
+
+
+        // Gourand
+
+        private void buttonGourand_Click(object sender, EventArgs e)
+        {
+            //Point3D light = new Point3D(-Math.Sqrt(8), 3, -Math.Sqrt(8));
+            Point3D light = new Point3D(0, 400, 0);
+            Polyhedron3D polyhedron = current.Copy();
+            polyhedron.FixPointsForBitmap();
+            Bitmap bitmap = GouraudShading.Gourand(polyhedron.Axonometric(), 400, 400, light, Color.Gray);
+            picture.Image = bitmap;
+            picture.Visible = true;
+        }
+
     }
 
     public delegate double callable(double x, double y);

@@ -69,6 +69,8 @@ namespace AffineTransformations3D
             this.checkBoxRemove = new System.Windows.Forms.CheckBox();
             this.buttonCamera = new System.Windows.Forms.Button();
             this.buttonZBuffer = new System.Windows.Forms.Button();
+            this.buttonAdd = new System.Windows.Forms.Button();
+            this.buttonGourand = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonAxonometric
@@ -112,21 +114,21 @@ namespace AffineTransformations3D
             // 
             // textBoxDx
             // 
-            this.textBoxDx.Location = new System.Drawing.Point(12, 173);
+            this.textBoxDx.Location = new System.Drawing.Point(11, 190);
             this.textBoxDx.Name = "textBoxDx";
             this.textBoxDx.Size = new System.Drawing.Size(60, 23);
             this.textBoxDx.TabIndex = 3;
             // 
             // textBoxDy
             // 
-            this.textBoxDy.Location = new System.Drawing.Point(78, 173);
+            this.textBoxDy.Location = new System.Drawing.Point(77, 190);
             this.textBoxDy.Name = "textBoxDy";
             this.textBoxDy.Size = new System.Drawing.Size(60, 23);
             this.textBoxDy.TabIndex = 4;
             // 
             // textBoxDz
             // 
-            this.textBoxDz.Location = new System.Drawing.Point(144, 173);
+            this.textBoxDz.Location = new System.Drawing.Point(143, 190);
             this.textBoxDz.Name = "textBoxDz";
             this.textBoxDz.Size = new System.Drawing.Size(60, 23);
             this.textBoxDz.TabIndex = 5;
@@ -134,7 +136,7 @@ namespace AffineTransformations3D
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 139);
+            this.label1.Location = new System.Drawing.Point(13, 157);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(67, 15);
             this.label1.TabIndex = 6;
@@ -143,7 +145,7 @@ namespace AffineTransformations3D
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(13, 155);
+            this.label2.Location = new System.Drawing.Point(12, 172);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(20, 15);
             this.label2.TabIndex = 7;
@@ -152,7 +154,7 @@ namespace AffineTransformations3D
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(78, 155);
+            this.label3.Location = new System.Drawing.Point(77, 172);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(20, 15);
             this.label3.TabIndex = 8;
@@ -161,7 +163,7 @@ namespace AffineTransformations3D
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(145, 155);
+            this.label4.Location = new System.Drawing.Point(144, 172);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(19, 15);
             this.label4.TabIndex = 9;
@@ -170,7 +172,7 @@ namespace AffineTransformations3D
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(12, 248);
+            this.label5.Location = new System.Drawing.Point(210, 157);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(112, 15);
             this.label5.TabIndex = 10;
@@ -178,21 +180,21 @@ namespace AffineTransformations3D
             // 
             // textBoxMx
             // 
-            this.textBoxMx.Location = new System.Drawing.Point(12, 281);
+            this.textBoxMx.Location = new System.Drawing.Point(210, 190);
             this.textBoxMx.Name = "textBoxMx";
             this.textBoxMx.Size = new System.Drawing.Size(60, 23);
             this.textBoxMx.TabIndex = 11;
             // 
             // textBoxMy
             // 
-            this.textBoxMy.Location = new System.Drawing.Point(78, 281);
+            this.textBoxMy.Location = new System.Drawing.Point(276, 190);
             this.textBoxMy.Name = "textBoxMy";
             this.textBoxMy.Size = new System.Drawing.Size(60, 23);
             this.textBoxMy.TabIndex = 12;
             // 
             // textBoxMz
             // 
-            this.textBoxMz.Location = new System.Drawing.Point(144, 281);
+            this.textBoxMz.Location = new System.Drawing.Point(342, 190);
             this.textBoxMz.Name = "textBoxMz";
             this.textBoxMz.Size = new System.Drawing.Size(60, 23);
             this.textBoxMz.TabIndex = 13;
@@ -200,7 +202,7 @@ namespace AffineTransformations3D
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(12, 263);
+            this.label6.Location = new System.Drawing.Point(210, 172);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(24, 15);
             this.label6.TabIndex = 14;
@@ -209,7 +211,7 @@ namespace AffineTransformations3D
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(78, 263);
+            this.label7.Location = new System.Drawing.Point(276, 172);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(24, 15);
             this.label7.TabIndex = 15;
@@ -218,7 +220,7 @@ namespace AffineTransformations3D
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(145, 263);
+            this.label8.Location = new System.Drawing.Point(343, 172);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(23, 15);
             this.label8.TabIndex = 16;
@@ -226,7 +228,7 @@ namespace AffineTransformations3D
             // 
             // buttonTranslation
             // 
-            this.buttonTranslation.Location = new System.Drawing.Point(12, 203);
+            this.buttonTranslation.Location = new System.Drawing.Point(11, 220);
             this.buttonTranslation.Name = "buttonTranslation";
             this.buttonTranslation.Size = new System.Drawing.Size(192, 23);
             this.buttonTranslation.TabIndex = 17;
@@ -236,7 +238,7 @@ namespace AffineTransformations3D
             // 
             // buttonScale
             // 
-            this.buttonScale.Location = new System.Drawing.Point(12, 311);
+            this.buttonScale.Location = new System.Drawing.Point(210, 220);
             this.buttonScale.Name = "buttonScale";
             this.buttonScale.Size = new System.Drawing.Size(192, 23);
             this.buttonScale.TabIndex = 18;
@@ -247,7 +249,7 @@ namespace AffineTransformations3D
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(13, 356);
+            this.label9.Location = new System.Drawing.Point(12, 250);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(69, 15);
             this.label9.TabIndex = 19;
@@ -255,7 +257,7 @@ namespace AffineTransformations3D
             // 
             // buttonReflectXy
             // 
-            this.buttonReflectXy.Location = new System.Drawing.Point(13, 375);
+            this.buttonReflectXy.Location = new System.Drawing.Point(12, 269);
             this.buttonReflectXy.Name = "buttonReflectXy";
             this.buttonReflectXy.Size = new System.Drawing.Size(191, 23);
             this.buttonReflectXy.TabIndex = 20;
@@ -265,7 +267,7 @@ namespace AffineTransformations3D
             // 
             // buttonReflectXz
             // 
-            this.buttonReflectXz.Location = new System.Drawing.Point(12, 405);
+            this.buttonReflectXz.Location = new System.Drawing.Point(11, 299);
             this.buttonReflectXz.Name = "buttonReflectXz";
             this.buttonReflectXz.Size = new System.Drawing.Size(192, 23);
             this.buttonReflectXz.TabIndex = 21;
@@ -275,7 +277,7 @@ namespace AffineTransformations3D
             // 
             // buttonReflectYz
             // 
-            this.buttonReflectYz.Location = new System.Drawing.Point(12, 435);
+            this.buttonReflectYz.Location = new System.Drawing.Point(11, 329);
             this.buttonReflectYz.Name = "buttonReflectYz";
             this.buttonReflectYz.Size = new System.Drawing.Size(192, 23);
             this.buttonReflectYz.TabIndex = 22;
@@ -286,7 +288,7 @@ namespace AffineTransformations3D
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(12, 480);
+            this.label10.Location = new System.Drawing.Point(209, 251);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(185, 15);
             this.label10.TabIndex = 23;
@@ -295,7 +297,7 @@ namespace AffineTransformations3D
             // buttonRotateX
             // 
             this.buttonRotateX.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.buttonRotateX.Location = new System.Drawing.Point(13, 498);
+            this.buttonRotateX.Location = new System.Drawing.Point(210, 269);
             this.buttonRotateX.Name = "buttonRotateX";
             this.buttonRotateX.Size = new System.Drawing.Size(191, 23);
             this.buttonRotateX.TabIndex = 24;
@@ -305,7 +307,7 @@ namespace AffineTransformations3D
             // 
             // buttonRotateY
             // 
-            this.buttonRotateY.Location = new System.Drawing.Point(13, 528);
+            this.buttonRotateY.Location = new System.Drawing.Point(210, 299);
             this.buttonRotateY.Name = "buttonRotateY";
             this.buttonRotateY.Size = new System.Drawing.Size(191, 23);
             this.buttonRotateY.TabIndex = 25;
@@ -315,7 +317,7 @@ namespace AffineTransformations3D
             // 
             // buttonRotateZ
             // 
-            this.buttonRotateZ.Location = new System.Drawing.Point(13, 558);
+            this.buttonRotateZ.Location = new System.Drawing.Point(210, 329);
             this.buttonRotateZ.Name = "buttonRotateZ";
             this.buttonRotateZ.Size = new System.Drawing.Size(191, 23);
             this.buttonRotateZ.TabIndex = 26;
@@ -326,7 +328,7 @@ namespace AffineTransformations3D
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(12, 603);
+            this.label11.Location = new System.Drawing.Point(211, 359);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(142, 15);
             this.label11.TabIndex = 27;
@@ -334,7 +336,7 @@ namespace AffineTransformations3D
             // 
             // textBoxLine
             // 
-            this.textBoxLine.Location = new System.Drawing.Point(12, 640);
+            this.textBoxLine.Location = new System.Drawing.Point(211, 396);
             this.textBoxLine.Name = "textBoxLine";
             this.textBoxLine.Size = new System.Drawing.Size(191, 23);
             this.textBoxLine.TabIndex = 28;
@@ -342,7 +344,7 @@ namespace AffineTransformations3D
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(13, 622);
+            this.label12.Location = new System.Drawing.Point(212, 378);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(92, 15);
             this.label12.TabIndex = 29;
@@ -350,7 +352,7 @@ namespace AffineTransformations3D
             // 
             // buttonRotateLine
             // 
-            this.buttonRotateLine.Location = new System.Drawing.Point(11, 669);
+            this.buttonRotateLine.Location = new System.Drawing.Point(210, 425);
             this.buttonRotateLine.Name = "buttonRotateLine";
             this.buttonRotateLine.Size = new System.Drawing.Size(192, 23);
             this.buttonRotateLine.TabIndex = 30;
@@ -420,7 +422,7 @@ namespace AffineTransformations3D
             this.checkBoxRemove.AutoSize = true;
             this.checkBoxRemove.Checked = true;
             this.checkBoxRemove.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxRemove.Location = new System.Drawing.Point(11, 720);
+            this.checkBoxRemove.Location = new System.Drawing.Point(13, 363);
             this.checkBoxRemove.Name = "checkBoxRemove";
             this.checkBoxRemove.Size = new System.Drawing.Size(190, 19);
             this.checkBoxRemove.TabIndex = 37;
@@ -430,7 +432,7 @@ namespace AffineTransformations3D
             // 
             // buttonCamera
             // 
-            this.buttonCamera.Location = new System.Drawing.Point(9, 745);
+            this.buttonCamera.Location = new System.Drawing.Point(11, 388);
             this.buttonCamera.Name = "buttonCamera";
             this.buttonCamera.Size = new System.Drawing.Size(195, 24);
             this.buttonCamera.TabIndex = 43;
@@ -440,7 +442,7 @@ namespace AffineTransformations3D
             // 
             // buttonZBuffer
             // 
-            this.buttonZBuffer.Location = new System.Drawing.Point(9, 775);
+            this.buttonZBuffer.Location = new System.Drawing.Point(11, 418);
             this.buttonZBuffer.Name = "buttonZBuffer";
             this.buttonZBuffer.Size = new System.Drawing.Size(195, 23);
             this.buttonZBuffer.TabIndex = 44;
@@ -448,11 +450,33 @@ namespace AffineTransformations3D
             this.buttonZBuffer.UseVisualStyleBackColor = true;
             this.buttonZBuffer.Click += new System.EventHandler(this.buttonZBuffer_Click);
             // 
+            // buttonAdd
+            // 
+            this.buttonAdd.Location = new System.Drawing.Point(11, 448);
+            this.buttonAdd.Name = "buttonAdd";
+            this.buttonAdd.Size = new System.Drawing.Size(195, 23);
+            this.buttonAdd.TabIndex = 45;
+            this.buttonAdd.Text = "Добавить фигуру";
+            this.buttonAdd.UseVisualStyleBackColor = true;
+            this.buttonAdd.Click += new System.EventHandler(this.buttonAdd_Click);
+            // 
+            // buttonGourand
+            // 
+            this.buttonGourand.Location = new System.Drawing.Point(11, 501);
+            this.buttonGourand.Name = "buttonGourand";
+            this.buttonGourand.Size = new System.Drawing.Size(195, 23);
+            this.buttonGourand.TabIndex = 46;
+            this.buttonGourand.Text = "Освещение Гуро";
+            this.buttonGourand.UseVisualStyleBackColor = true;
+            this.buttonGourand.Click += new System.EventHandler(this.buttonGourand_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 804);
+            this.ClientSize = new System.Drawing.Size(884, 804);
+            this.Controls.Add(this.buttonGourand);
+            this.Controls.Add(this.buttonAdd);
             this.Controls.Add(this.buttonZBuffer);
             this.Controls.Add(this.buttonCamera);
             this.Controls.Add(this.checkBoxRemove);
@@ -544,6 +568,8 @@ namespace AffineTransformations3D
         private System.Windows.Forms.CheckBox checkBoxRemove;
         private System.Windows.Forms.Button buttonCamera;
         private System.Windows.Forms.Button buttonZBuffer;
+        private System.Windows.Forms.Button buttonAdd;
+        private System.Windows.Forms.Button buttonGourand;
     }
 }
 

@@ -121,6 +121,29 @@ namespace AffineTransformations3D
             return res;
         }
 
+        public void FixPointsForBitmap()
+        {
+            foreach (Polygon3D polygon in polygons)
+            {
+                foreach (Line3D line in polygon.lines)
+                {
+                    double x = line.first.x;
+                    double y = line.first.y;
+                    double z = line.first.z;
+                    line.first.x = -z;
+                    line.first.y = -y;
+                    line.first.z = -x;
+
+                    x = line.second.x;
+                    y = line.second.y;
+                    z = line.second.z;
+                    line.second.x = -z;
+                    line.second.y = -y;
+                    line.second.z = -x;
+                }
+            }
+        }
+
         public Point3D Center()
         {
             int pointCnt = 0;

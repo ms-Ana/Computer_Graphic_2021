@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Drawing;
 
 namespace AffineTransformations3D
 {
@@ -325,7 +326,116 @@ namespace AffineTransformations3D
             return result;
         }
 
+        public static List<List<Tuple<Point3D, Tuple<double, double>>>> RasterizeWithTexture(Polyhedron3D polyhedron)
+        {
+            List<List<Tuple<Point3D, Tuple<double, double>>>> rasterizedPolyhedron = 
+                new List<List<Tuple<Point3D, Tuple<double, double>>>>();
+            foreach (var polygon in polyhedron.polygons)
+            {
+                List<Tuple<Point3D, Tuple<double, double>>> rasterizedPolygon = 
+                    new List<Tuple<Point3D, Tuple<double, double>>>();
+                var polygonPoints = PolygonToPoints(polygon);
+                var triangles = Triangulate(polygonPoints);
+                foreach (var triangle in triangles)
+                    rasterizedPolygon.AddRange(RasterizeTriangleWithTexture(triangle));
+                rasterizedPolyhedron.Add(rasterizedPolygon);
+            }
+
+            return rasterizedPolyhedron;
+        }
+
+        private static List<Tuple<Point3D, Tuple<double, double>>> RasterizeTriangleWithTexture(List<Point3D> point3Ds)
+        {
+            List<Tuple<Point3D, Tuple<double, double>>> rasterizedTriangle = 
+                new List<Tuple<Point3D, Tuple<double, double>>>();
+            var triangle = point3Ds.OrderBy(point => point.y).ToList();
+
+            var x01s = Interpolate(triangle[0].y, triangle[0].x, triangle[1].y, triangle[1].x);
+            var x12s = Interpolate(triangle[1].y, triangle[1].x, triangle[2].y, triangle[2].x);
+            var x02s = Interpolate(triangle[0].y, triangle[0].x, triangle[2].y, triangle[2].x);
+
+            var z01s = Interpolate(triangle[0].y, triangle[0].z, triangle[1].y, triangle[1].z);
+            var z12s = Interpolate(triangle[1].y, triangle[1].z, triangle[2].y, triangle[2].z);
+            var z02s = Interpolate(triangle[0].y, triangle[0].z, triangle[2].y, triangle[2].z);
+
+            /*var u01s = Interpolate(triangle[0].x, 0, triangle[1].x, 1);
+            var u12s = Interpolate(triangle[1].x, 0, triangle[2].x, 1);
+            var u02s = Interpolate(triangle[0].x, 0, triangle[2].x, 1);
+
+            var v01s = Interpolate(triangle[0].y, 0, triangle[1].y, 1);
+            var v12s = Interpolate(triangle[1].y, 0, triangle[2].y, 1);
+            var v02s = Interpolate(triangle[0].y, 0, triangle[2].y, 1);*/
+
+            x01s.RemoveAt(x01s.Count - 1);
+            z01s.RemoveAt(z01s.Count - 1);
+            /*if (u01s.Count > 0)
+                u01s.RemoveAt(u01s.Count - 1);
+            if (v01s.Count > 0)
+                v01s.RemoveAt(v01s.Count - 1);*/
+
+            var x012s = x01s.Concat(x12s).ToList();
+            var z012s = z01s.Concat(z12s).ToList();
+            /*var u012s = u01s.Concat(u12s).ToList();
+            var v012s = v01s.Concat(v12s).ToList();*/
+
+            int middle = x012s.Count / 2;
+            List<int> lX = x02s[middle] < x012s[middle] ? x02s : x012s,
+                      rX = x02s[middle] < x012s[middle] ? x012s : x02s,
+                      lZ = x02s[middle] < x012s[middle] ? z02s : z012s,
+                      rZ = x02s[middle] < x012s[middle] ? z012s : z02s;
+                      /*lU = x02s[middle] < x012s[middle] ? u02s : u012s,
+                      rU = x02s[middle] < x012s[middle] ? u012s : u02s,
+                      lV = x02s[middle] < x012s[middle] ? v02s : v012s,
+                      rV = x02s[middle] < x012s[middle] ? v012s : v02s;*/
 
 
+            int y0 = (int)triangle[0].y, y2 = (int)triangle[2].y;
+            for (int i = 0; i <= y2 - y0; i++)
+            {
+                int curxL = lX[i], curxR = rX[i];
+                var currZ = Interpolate(curxL, lZ[i], curxR, rZ[i]);
+                /*var currU = Interpolate(curxL, lU[i], curxR, i >= rU.Count ? rU[0] : rU[i]);
+                var currV = Interpolate(curxL, lV[i], curxR, i >= rV.Count ? rV[0] : rV[i]);*/
+                for (int x = curxL; x < curxR; x++)
+                {
+                    Point3D a = triangle[0];
+                    Point3D e1 = triangle[1] - triangle[0];
+                    Point3D e2 = triangle[2] - triangle[0];
+                    Point3D n = CrossProduct(e1, e2);
+                    Point3D m = CrossProduct(e2, a);
+                    Point3D l = CrossProduct(a, e1);
+                    double deltaL = curxL * n.x + y0 * n.y + n.z;
+                    double uL = curxL * m.x + y0 * m.y + m.z;
+                    double vL = curxL * l.x + y0 * l.y + l.z;
+                    uL /= deltaL; vL /= deltaL;
+                    double deltaR = curxR * n.x + y2 * n.y + n.z;
+                    double uR = curxR * m.x + y2 * m.y + m.z;
+                    double vR = curxR * l.x + y2 * l.y + l.z;
+                    uR /= deltaR; vR /= deltaR;
+                    double curxM = (curxL + curxR) / 2;
+                    double yM = (y0 + y2) / 2;
+                    double deltaM = curxM * n.x + yM * n.y + n.z;
+                    double uM = curxM * m.x + yM * m.y + m.z;
+                    double vM = curxM * l.x + yM * l.y + l.z;
+                    uM /= deltaM; vM /= deltaM;
+
+                    double k = uL + uR - 2 * uM;
+                    double a2 = 2 * k / ((curxR - curxL) * (curxR - curxL));
+                    double a1 = (uR - uL) / (curxR - curxL) - ((2 * k) / ((curxR - curxL) * (curxR - curxL))) * (curxR + curxL);
+                    double a0 = uL - a1 * curxL - a2 * curxL * curxL;
+                    double u = a0 + a1 * x + a2 * x * x;
+
+                    k = vL + vR - 2 * vM;
+                    a2 = 2 * k / ((y2 - y0) * (y2 - y0));
+                    a1 = (vR - vL) / (y2 - y0) - ((2 * k) / ((y2 - y0) * (y2 - y0))) * (y2 + y0);
+                    a0 = vL - a1 * y0 - a2 * y0 * y0;
+                    double v = a0 + a1 * (y0 + i) + a2 * (y0 + i) * (y0 + i);
+
+                    rasterizedTriangle.Add(Tuple.Create(new Point3D(x, y0 + i, currZ[x - curxL]), Tuple.Create(u, v)));
+                }
+            }
+
+            return rasterizedTriangle;
+        }
     }
 }

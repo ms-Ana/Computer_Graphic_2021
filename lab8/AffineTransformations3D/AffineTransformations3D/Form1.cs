@@ -811,6 +811,23 @@ namespace AffineTransformations3D
             picture.Visible = true;
         }
 
+
+        // Texture
+
+        private void buttonTexture_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog open = new OpenFileDialog();
+            open.Filter = "Image Files(*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp";
+            if (open.ShowDialog() == DialogResult.OK)
+            {
+                Bitmap texture = new Bitmap(open.FileName);
+                Polyhedron3D polyhedron = current.Copy();
+                polyhedron.FixPointsForBitmap();
+                Bitmap bitmap = Texture.GetTexture(polyhedron.Axonometric(), texture, 400, 400);
+                picture.Image = bitmap;
+                picture.Visible = true;
+            }
+        }
     }
 
     public delegate double callable(double x, double y);

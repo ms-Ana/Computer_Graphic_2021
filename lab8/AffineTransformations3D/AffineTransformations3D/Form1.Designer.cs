@@ -71,6 +71,7 @@ namespace AffineTransformations3D
             this.buttonZBuffer = new System.Windows.Forms.Button();
             this.buttonAdd = new System.Windows.Forms.Button();
             this.buttonGourand = new System.Windows.Forms.Button();
+            this.buttonTexture = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonAxonometric
@@ -470,11 +471,22 @@ namespace AffineTransformations3D
             this.buttonGourand.UseVisualStyleBackColor = true;
             this.buttonGourand.Click += new System.EventHandler(this.buttonGourand_Click);
             // 
+            // buttonTexture
+            // 
+            this.buttonTexture.Location = new System.Drawing.Point(11, 531);
+            this.buttonTexture.Name = "buttonTexture";
+            this.buttonTexture.Size = new System.Drawing.Size(195, 23);
+            this.buttonTexture.TabIndex = 47;
+            this.buttonTexture.Text = "Наложение текстуры";
+            this.buttonTexture.UseVisualStyleBackColor = true;
+            this.buttonTexture.Click += new System.EventHandler(this.buttonTexture_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(884, 804);
+            this.Controls.Add(this.buttonTexture);
             this.Controls.Add(this.buttonGourand);
             this.Controls.Add(this.buttonAdd);
             this.Controls.Add(this.buttonZBuffer);
@@ -570,6 +582,7 @@ namespace AffineTransformations3D
         private System.Windows.Forms.Button buttonZBuffer;
         private System.Windows.Forms.Button buttonAdd;
         private System.Windows.Forms.Button buttonGourand;
+        private System.Windows.Forms.Button buttonTexture;
     }
 }
 

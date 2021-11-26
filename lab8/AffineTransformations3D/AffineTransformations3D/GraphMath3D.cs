@@ -227,7 +227,7 @@ namespace AffineTransformations3D
             var z012s = z01s.Concat(z12s).ToList();
 
             int middle = x012s.Count / 2;
-            List<int> lX = x02s[middle] < x012s[middle] ? x02s : x012s,
+            List<double> lX = x02s[middle] < x012s[middle] ? x02s : x012s,
                       rX = x02s[middle] < x012s[middle] ? x012s : x02s,
                       lZ = x02s[middle] < x012s[middle] ? z02s : z012s,
                       rZ = x02s[middle] < x012s[middle] ? z012s : z02s;
@@ -235,7 +235,7 @@ namespace AffineTransformations3D
             int y0 = (int)triangle[0].y, y2 = (int)triangle[2].y;
             for (int i = 0; i <= y2 - y0; i++)
             {
-                int curxL = lX[i], curxR = rX[i];
+                int curxL = (int)lX[i], curxR = (int)rX[i];
                 var currZ = Interpolate(curxL, lZ[i], curxR, rZ[i]);
                 for (int x = curxL; x < curxR; x++)
                     rasterizedTriangle.Add(new Point3D(x, (y0 + i), currZ[x - curxL]));
@@ -286,7 +286,7 @@ namespace AffineTransformations3D
             var h012s = h01s.Concat(h12s).ToList();
 
             int middle = x012s.Count / 2;
-            List<int> lX = x02s[middle] < x012s[middle] ? x02s : x012s,
+            List<double> lX = x02s[middle] < x012s[middle] ? x02s : x012s,
                       rX = x02s[middle] < x012s[middle] ? x012s : x02s,
                       lZ = x02s[middle] < x012s[middle] ? z02s : z012s,
                       rZ = x02s[middle] < x012s[middle] ? z012s : z02s,
@@ -297,7 +297,7 @@ namespace AffineTransformations3D
             int y0 = (int)triangle[0].y, y2 = (int)triangle[2].y;
             for (int i = 0; i <= y2 - y0; i++)
             {
-                int curxL = lX[i], curxR = rX[i];
+                int curxL = (int)lX[i], curxR = (int)rX[i];
                 var currZ = Interpolate(curxL, lZ[i], curxR, rZ[i]);
                 var currH = Interpolate(curxL, lH[i], curxR, rH[i]);
                 for (int x = curxL; x < curxR; x++)
@@ -307,19 +307,19 @@ namespace AffineTransformations3D
             return rasterizedTriangle;
         }
 
-        private static List<int> Interpolate(double cord1Start, double cord2Start, double cord1End, double cord2End)
+        private static List<double> Interpolate(double cord1Start, double cord2Start, double cord1End, double cord2End)
         {
             int cord1StartI = (int)cord1Start, cord1EndI = (int)cord1End;
             if (cord1Start == cord1End)
-                return new List<int> { (int)cord2Start };
+                return new List<double> { (double)cord2Start };
 
-            List<int> result = new List<int>();
+            List<double> result = new List<double>();
 
             var slope = (cord2End - cord2Start) / (cord1End - cord1Start);
             double curx = cord2Start;
             for (int i = cord1StartI; i <= cord1EndI; i++)
             {
-                result.Add((int)curx);
+                result.Add(curx);
                 curx += slope;
             }
 
@@ -379,7 +379,7 @@ namespace AffineTransformations3D
             var v012s = v01s.Concat(v12s).ToList();*/
 
             int middle = x012s.Count / 2;
-            List<int> lX = x02s[middle] < x012s[middle] ? x02s : x012s,
+            List<double> lX = x02s[middle] < x012s[middle] ? x02s : x012s,
                       rX = x02s[middle] < x012s[middle] ? x012s : x02s,
                       lZ = x02s[middle] < x012s[middle] ? z02s : z012s,
                       rZ = x02s[middle] < x012s[middle] ? z012s : z02s;
@@ -392,7 +392,7 @@ namespace AffineTransformations3D
             int y0 = (int)triangle[0].y, y2 = (int)triangle[2].y;
             for (int i = 0; i <= y2 - y0; i++)
             {
-                int curxL = lX[i], curxR = rX[i];
+                int curxL = (int)lX[i], curxR = (int)rX[i];
                 var currZ = Interpolate(curxL, lZ[i], curxR, rZ[i]);
                 /*var currU = Interpolate(curxL, lU[i], curxR, i >= rU.Count ? rU[0] : rU[i]);
                 var currV = Interpolate(curxL, lV[i], curxR, i >= rV.Count ? rV[0] : rV[i]);*/

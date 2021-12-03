@@ -4,8 +4,6 @@
 #include <SFML/Graphics.hpp>
 
 #include <iostream>
-#include <vector>
-
 
 GLuint Program;
 
@@ -76,8 +74,7 @@ int main() {
 	window.setActive(true);
 
 	glewInit();
-	glEnable(GL_DEPTH_TEST);
-
+	
 	Init();
 
 	while (window.isOpen()) {
@@ -176,8 +173,6 @@ void InitVBO()
 		float t = 2.0f * 3.1415f * i / 360;
 		triangle[i]= { 0.5f * std::cosf(t), 0.5f * std::sinf(t) };
 	}
-
-	std::vector<Color> colors_vec;
 	Color colors[tr + 2];
 	colors[0] = { 1.0, 1.0, 1.0, 1.0 };
 	
@@ -243,7 +238,7 @@ void InitShader() {
 	Unif_color = glGetUniformLocation(Program, unif_name);
 	if (Unif_color == -1)
 	{
-		std::cout << "could not bind uniform " << unif_name << std::endl;
+		std::cout << "could not bind " << unif_name << std::endl;
 		return;
 	}
 

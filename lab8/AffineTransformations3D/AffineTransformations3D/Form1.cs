@@ -89,15 +89,15 @@ namespace AffineTransformations3D
         {
             ComboBox cmb = (ComboBox)sender;
             int currentPolyhedron = cmb.SelectedIndex;
-            Polyhedron3D p = Figures.Hexahedron(scale);
+            Polyhedron3D p = Figures.HexahedronWithTexture(scale);
             HideButtons(false);
             switch (currentPolyhedron)
             {
                 case 1:
-                    p = Figures.Tetrahedron(scale);
+                    p = Figures.TetrahedronWithTexture(scale);
                     break;
                 case 2:
-                    p = Figures.Octahedron(scale);
+                    p = Figures.OctahedronWithTexture(scale);
                     break;
                 case 3:
                     p = Figures.Icosahedron(scale);
@@ -211,12 +211,12 @@ namespace AffineTransformations3D
         // Draw Axis
         private void DrawAxisAxonometric()
         {
-            Point3D startX = new Point3D(-2000, 0, 0);
-            Point3D startY = new Point3D(0, -2000, 0);
-            Point3D startZ = new Point3D(0, 0, -2000);
-            Point3D x = new Point3D(2000, 0, 0);
-            Point3D y = new Point3D(0, 2000, 0);
-            Point3D z = new Point3D(0, 0, 2000);
+            Point3DWithTexture startX = new Point3DWithTexture(-2000, 0, 0);
+            Point3DWithTexture startY = new Point3DWithTexture(0, -2000, 0);
+            Point3DWithTexture startZ = new Point3DWithTexture(0, 0, -2000);
+            Point3DWithTexture x = new Point3DWithTexture(2000, 0, 0);
+            Point3DWithTexture y = new Point3DWithTexture(0, 2000, 0);
+            Point3DWithTexture z = new Point3DWithTexture(0, 0, 2000);
 
             Line3D xAxis = new Line3D(startX, x);
             Polygon3D s1 = new Polygon3D(new List<Line3D> { xAxis });
@@ -236,12 +236,12 @@ namespace AffineTransformations3D
 
         private void DrawAxisPerspective()
         {
-            Point3D startX = new Point3D(-2000, 0, 0);
-            Point3D startY = new Point3D(0, -2000, 0);
-            Point3D startZ = new Point3D(0, 0, -2000);
-            Point3D x = new Point3D(2000, 0, 0);
-            Point3D y = new Point3D(0, 2000, 0);
-            Point3D z = new Point3D(0, 0, 2000);
+            Point3DWithTexture startX = new Point3DWithTexture(-2000, 0, 0);
+            Point3DWithTexture startY = new Point3DWithTexture(0, -2000, 0);
+            Point3DWithTexture startZ = new Point3DWithTexture(0, 0, -2000);
+            Point3DWithTexture x = new Point3DWithTexture(2000, 0, 0);
+            Point3DWithTexture y = new Point3DWithTexture(0, 2000, 0);
+            Point3DWithTexture z = new Point3DWithTexture(0, 0, 2000);
 
             Line3D xAxis = new Line3D(startX, x);
             Polygon3D s1 = new Polygon3D(new List<Line3D> { xAxis });
@@ -337,8 +337,8 @@ namespace AffineTransformations3D
                         bool z2Success = Int32.TryParse(points[5], out z2);
                         if (x1Success && y1Success && z1Success && x2Success && y2Success && z2Success)
                         {
-                            Point3D first = new Point3D(x1, y1, z1);
-                            Point3D second = new Point3D(x2, y2, z2);
+                            Point3DWithTexture first = new Point3DWithTexture(x1, y1, z1);
+                            Point3DWithTexture second = new Point3DWithTexture(x2, y2, z2);
                             Line3D line = new Line3D(first, second);
                             current.RotateLine(rotationAngle, line);
                         }
@@ -807,7 +807,7 @@ namespace AffineTransformations3D
         private void buttonGourand_Click(object sender, EventArgs e)
         {
             //Point3D light = new Point3D(-Math.Sqrt(8), 3, -Math.Sqrt(8));
-            Point3D light = new Point3D(0, 400, 0);
+            Point3DWithTexture light = new Point3DWithTexture(0, 400, 0);
             Polyhedron3D polyhedron = current.Copy();
             polyhedron.FixPointsForBitmap();
             Bitmap bitmap = GouraudShading.Gourand(polyhedron.Axonometric(), 400, 400, light, Color.Gray);

@@ -8,14 +8,14 @@ namespace AffineTransformations3D
     {
         public static Polyhedron3D Hexahedron(int scale)
         {
-            Point3D p1 = new Point3D(0, 0, 0);
-            Point3D p2 = new Point3D(scale, 0, 0);
-            Point3D p3 = new Point3D(0, scale, 0);
-            Point3D p4 = new Point3D(0, 0, scale);
-            Point3D p5 = new Point3D(scale, scale, 0);
-            Point3D p6 = new Point3D(scale, 0, scale);
-            Point3D p7 = new Point3D(0, scale, scale);
-            Point3D p8 = new Point3D(scale, scale, scale);
+            Point3DWithTexture p1 = new Point3DWithTexture(0, 0, 0);
+            Point3DWithTexture p2 = new Point3DWithTexture(scale, 0, 0);
+            Point3DWithTexture p3 = new Point3DWithTexture(0, scale, 0);
+            Point3DWithTexture p4 = new Point3DWithTexture(0, 0, scale);
+            Point3DWithTexture p5 = new Point3DWithTexture(scale, scale, 0);
+            Point3DWithTexture p6 = new Point3DWithTexture(scale, 0, scale);
+            Point3DWithTexture p7 = new Point3DWithTexture(0, scale, scale);
+            Point3DWithTexture p8 = new Point3DWithTexture(scale, scale, scale);
 
             Line3D l1 = new Line3D(p6, p8);
             Line3D l2 = new Line3D(p8, p7);
@@ -57,13 +57,87 @@ namespace AffineTransformations3D
             return p;
         }
 
+        public static Polyhedron3D HexahedronWithTexture(int scale)
+        {
+            Point3DWithTexture p1 = new Point3DWithTexture(0, 0, 0);
+            Point3DWithTexture p2 = new Point3DWithTexture(scale, 0, 0);
+            Point3DWithTexture p3 = new Point3DWithTexture(0, scale, 0);
+            Point3DWithTexture p4 = new Point3DWithTexture(0, 0, scale);
+            Point3DWithTexture p5 = new Point3DWithTexture(scale, scale, 0);
+            Point3DWithTexture p6 = new Point3DWithTexture(scale, 0, scale);
+            Point3DWithTexture p7 = new Point3DWithTexture(0, scale, scale);
+            Point3DWithTexture p8 = new Point3DWithTexture(scale, scale, scale);
+
+            p8.xTex = 0; p8.yTex = 0;
+            p6.xTex = 1; p6.yTex = 0;
+            p7.xTex = 0; p7.yTex = 1;
+            p4.xTex = 1; p4.yTex = 1;
+            Line3D l1 = new Line3D(p6, p8);
+            Line3D l2 = new Line3D(p8, p7);
+            Line3D l3 = new Line3D(p7, p4);
+            Line3D l4 = new Line3D(p4, p6);
+            Polygon3D side1 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4 });
+
+            p4.xTex = 0; p4.yTex = 0;
+            p6.xTex = 1; p6.yTex = 0;
+            p1.xTex = 0; p1.yTex = 1;
+            p2.xTex = 1; p2.yTex = 1;
+            l1 = new Line3D(p2, p6);
+            l2 = new Line3D(p6, p4);
+            l3 = new Line3D(p4, p1);
+            l4 = new Line3D(p1, p2);
+            Polygon3D side2 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4 });
+
+            p6.xTex = 0; p6.yTex = 0;
+            p8.xTex = 1; p8.yTex = 0;
+            p2.xTex = 0; p2.yTex = 1;
+            p5.xTex = 1; p5.yTex = 1;
+            l1 = new Line3D(p8, p6);
+            l2 = new Line3D(p6, p2);
+            l3 = new Line3D(p2, p5);
+            l4 = new Line3D(p5, p8);
+            Polygon3D side3 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4 });
+
+            p1.xTex = 0; p1.yTex = 0;
+            p3.xTex = 1; p3.yTex = 0;
+            p2.xTex = 0; p2.yTex = 1;
+            p5.xTex = 1; p5.yTex = 1;
+            l1 = new Line3D(p5, p2);
+            l2 = new Line3D(p2, p1);
+            l3 = new Line3D(p1, p3);
+            l4 = new Line3D(p3, p5);
+            Polygon3D side4 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4 });
+
+            p8.xTex = 0; p8.yTex = 0;
+            p7.xTex = 1; p7.yTex = 0;
+            p5.xTex = 0; p5.yTex = 1;
+            p3.xTex = 1; p3.yTex = 1;
+            l1 = new Line3D(p7, p8);
+            l2 = new Line3D(p8, p5);
+            l3 = new Line3D(p5, p3);
+            l4 = new Line3D(p3, p7);
+            Polygon3D side5 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4 });
+
+            p7.xTex = 0; p7.yTex = 0;
+            p4.xTex = 1; p4.yTex = 0;
+            p3.xTex = 0; p3.yTex = 1;
+            p1.xTex = 1; p1.yTex = 1;
+            l1 = new Line3D(p4, p7);
+            l2 = new Line3D(p7, p3);
+            l3 = new Line3D(p3, p1);
+            l4 = new Line3D(p1, p4);
+            Polygon3D side6 = new Polygon3D(new List<Line3D> { l1, l2, l3, l4 });
+
+            Polyhedron3D p = new Polyhedron3D(new List<Polygon3D> { side1, side2, side3, side4, side5, side6 });
+            return p;
+        }
+
         public static Polyhedron3D Tetrahedron(int scale)
         {
-            Point3D p1 = new Point3D(0, 0, 0);
-            Point3D p2 = new Point3D(scale, 0, 0);
-            Point3D p3 = new Point3D(0, scale, 0);
-            Point3D p4 = new Point3D(0, 0, scale);
-            Point3D p8 = new Point3D(scale, scale, scale);
+            Point3DWithTexture p2 = new Point3DWithTexture(scale, 0, 0);
+            Point3DWithTexture p3 = new Point3DWithTexture(0, scale, 0);
+            Point3DWithTexture p4 = new Point3DWithTexture(0, 0, scale);
+            Point3DWithTexture p8 = new Point3DWithTexture(scale, scale, scale);
 
             Line3D l1 = new Line3D(p2, p8);
             Line3D l2 = new Line3D(p8, p4);
@@ -89,14 +163,57 @@ namespace AffineTransformations3D
             return p;
         }
 
+        public static Polyhedron3D TetrahedronWithTexture(int scale)
+        {
+            Point3DWithTexture p2 = new Point3DWithTexture(scale, 0, 0);
+            Point3DWithTexture p3 = new Point3DWithTexture(0, scale, 0);
+            Point3DWithTexture p4 = new Point3DWithTexture(0, 0, scale);
+            Point3DWithTexture p8 = new Point3DWithTexture(scale, scale, scale);
+
+            p8.xTex = 0.5; p8.yTex = (2 - Math.Sqrt(3)) / 2;
+            p4.xTex = 0; p4.yTex = 1;
+            p2.xTex = 1; p2.yTex = 1;
+            Line3D l1 = new Line3D(p2, p8);
+            Line3D l2 = new Line3D(p8, p4);
+            Line3D l3 = new Line3D(p4, p2);
+            Polygon3D side1 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
+
+            p8.xTex = 0.5; p8.yTex = (2 - Math.Sqrt(3)) / 2;
+            p2.xTex = 0; p2.yTex = 1;
+            p3.xTex = 1; p3.yTex = 1;
+            l1 = new Line3D(p8, p2);
+            l2 = new Line3D(p2, p3);
+            l3 = new Line3D(p3, p8);
+            Polygon3D side2 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
+
+            p8.xTex = 0.5; p8.yTex = (2 - Math.Sqrt(3)) / 2;
+            p3.xTex = 0; p3.yTex = 1;
+            p4.xTex = 1; p4.yTex = 1;
+            l1 = new Line3D(p3, p4);
+            l2 = new Line3D(p4, p8);
+            l3 = new Line3D(p8, p3);
+            Polygon3D side3 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
+
+            p4.xTex = 0.5; p4.yTex = (2 - Math.Sqrt(3)) / 2;
+            p3.xTex = 0; p3.yTex = 1;
+            p2.xTex = 1; p2.yTex = 1;
+            l1 = new Line3D(p4, p3);
+            l2 = new Line3D(p3, p2);
+            l3 = new Line3D(p2, p4);
+            Polygon3D side4 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
+
+            Polyhedron3D p = new Polyhedron3D(new List<Polygon3D> { side1, side2, side3, side4 });
+            return p;
+        }
+
         public static Polyhedron3D Octahedron(int scale)
         {
-            Point3D p1 = new Point3D(scale, scale, scale * 2);
-            Point3D p2 = new Point3D(scale, 0, scale);
-            Point3D p3 = new Point3D(scale * 2, scale, scale);
-            Point3D p4 = new Point3D(0, scale, scale);
-            Point3D p5 = new Point3D(scale, scale, 0);
-            Point3D p6 = new Point3D(scale, scale * 2, scale);
+            Point3DWithTexture p1 = new Point3DWithTexture(scale, scale, scale * 2);
+            Point3DWithTexture p2 = new Point3DWithTexture(scale, 0, scale);
+            Point3DWithTexture p3 = new Point3DWithTexture(scale * 2, scale, scale);
+            Point3DWithTexture p4 = new Point3DWithTexture(0, scale, scale);
+            Point3DWithTexture p5 = new Point3DWithTexture(scale, scale, 0);
+            Point3DWithTexture p6 = new Point3DWithTexture(scale, scale * 2, scale);
 
             Line3D l1 = new Line3D(p1, p2);
             Line3D l2 = new Line3D(p2, p3);
@@ -142,63 +259,140 @@ namespace AffineTransformations3D
             return p;
         }
 
+        public static Polyhedron3D OctahedronWithTexture(int scale)
+        {
+            Point3DWithTexture p1 = new Point3DWithTexture(scale, scale, scale * 2);
+            Point3DWithTexture p2 = new Point3DWithTexture(scale, 0, scale);
+            Point3DWithTexture p3 = new Point3DWithTexture(scale * 2, scale, scale);
+            Point3DWithTexture p4 = new Point3DWithTexture(0, scale, scale);
+            Point3DWithTexture p5 = new Point3DWithTexture(scale, scale, 0);
+            Point3DWithTexture p6 = new Point3DWithTexture(scale, scale * 2, scale);
+
+            p1.xTex = 0.5; p1.yTex = (2 - Math.Sqrt(3)) / 2;
+            p2.xTex = 0; p2.yTex = 1;
+            p3.xTex = 1; p3.yTex = 1;
+            Line3D l1 = new Line3D(p1, p2);
+            Line3D l2 = new Line3D(p2, p3);
+            Line3D l3 = new Line3D(p3, p1);
+            Polygon3D side1 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
+
+            p1.xTex = 0.5; p1.yTex = (2 - Math.Sqrt(3)) / 2;
+            p4.xTex = 0; p4.yTex = 1;
+            p2.xTex = 1; p2.yTex = 1;
+            l1 = new Line3D(p1, p4);
+            l2 = new Line3D(p4, p2);
+            l3 = new Line3D(p2, p1);
+            Polygon3D side2 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
+
+            p1.xTex = 0.5; p1.yTex = (2 - Math.Sqrt(3)) / 2;
+            p6.xTex = 0; p6.yTex = 1;
+            p4.xTex = 1; p4.yTex = 1;
+            l1 = new Line3D(p1, p6);
+            l2 = new Line3D(p6, p4);
+            l3 = new Line3D(p4, p1);
+            Polygon3D side3 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
+
+            p1.xTex = 0.5; p1.yTex = (2 - Math.Sqrt(3)) / 2;
+            p3.xTex = 0; p3.yTex = 1;
+            p6.xTex = 1; p6.yTex = 1;
+            l1 = new Line3D(p1, p3);
+            l2 = new Line3D(p3, p6);
+            l3 = new Line3D(p6, p1);
+            Polygon3D side4 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
+
+            p5.xTex = 0.5; p5.yTex = Math.Sqrt(3) / 2;
+            p2.xTex = 0; p2.yTex = 0;
+            p3.xTex = 1; p3.yTex = 0;
+            l1 = new Line3D(p3, p2);
+            l2 = new Line3D(p2, p5);
+            l3 = new Line3D(p5, p3);
+            Polygon3D side5 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
+
+            p5.xTex = 0.5; p5.yTex = Math.Sqrt(3) / 2;
+            p4.xTex = 0; p4.yTex = 0;
+            p2.xTex = 1; p2.yTex = 0;
+            l1 = new Line3D(p2, p4);
+            l2 = new Line3D(p4, p5);
+            l3 = new Line3D(p5, p2);
+            Polygon3D side6 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
+
+            p5.xTex = 0.5; p5.yTex = Math.Sqrt(3) / 2;
+            p6.xTex = 0; p6.yTex = 0;
+            p4.xTex = 1; p4.yTex = 0;
+            l1 = new Line3D(p4, p6);
+            l2 = new Line3D(p6, p5);
+            l3 = new Line3D(p5, p4);
+            Polygon3D side7 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
+
+            p5.xTex = 0.5; p5.yTex = Math.Sqrt(3) / 2;
+            p3.xTex = 0; p3.yTex = 0;
+            p6.xTex = 1; p6.yTex = 0;
+            l1 = new Line3D(p6, p3);
+            l2 = new Line3D(p3, p5);
+            l3 = new Line3D(p5, p6);
+            Polygon3D side8 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
+
+            Polyhedron3D p = new Polyhedron3D(new List<Polygon3D> { side1, side2, side3, side4, side5, side6, side7, side8 });
+            return p;
+        }
+
         public static Polyhedron3D Icosahedron(int scale)
         {
             double t = scale * Math.Sqrt((5 - Math.Sqrt(5)) / 2);
             double h = Math.Sqrt(t * t - t * t / 4);
             double h2 = Math.Sqrt(scale * scale - t * t / 4);
             double val = Math.Sqrt(h * h - h2 * h2);
-            Point3D p1 = new Point3D(0, 0, 0);
+            Point3DWithTexture p1 = new Point3DWithTexture(0, 0, 0);
             double z = val;
 
-            Point3D p2 = new Point3D(-scale, 0, z);
+            Point3DWithTexture p2 = new Point3DWithTexture(-scale, 0, z);
             double rad = (Math.PI / 180) * 72;
             double x = -scale;
             double y = 0.0;
             double newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             double newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p3 = new Point3D(newX, newY, z);
+            Point3DWithTexture p3 = new Point3DWithTexture(newX, newY, z);
             x = newX; y = newY;
 
             newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p4 = new Point3D(newX, newY, z);
+            Point3DWithTexture p4 = new Point3DWithTexture(newX, newY, z);
             x = newX; y = newY;
 
             newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p5 = new Point3D(newX, newY, z);
+            Point3DWithTexture p5 = new Point3DWithTexture(newX, newY, z);
             x = newX; y = newY;
 
             newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p6 = new Point3D(newX, newY, z);
+            Point3DWithTexture p6 = new Point3DWithTexture(newX, newY, z);
 
             z += h;
-            Point3D p7 = new Point3D(scale, 0, z);
+            Point3DWithTexture p7 = new Point3DWithTexture(scale, 0, z);
             x = scale;
             y = 0.0;
             newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p8 = new Point3D(newX, newY, z);
+            Point3DWithTexture p8 = new Point3DWithTexture(newX, newY, z);
             x = newX; y = newY;
 
             newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p9 = new Point3D(newX, newY, z);
+            Point3DWithTexture p9 = new Point3DWithTexture(newX, newY, z);
             x = newX; y = newY;
 
             newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p10 = new Point3D(newX, newY, z);
+            Point3DWithTexture p10 = new Point3DWithTexture(newX, newY, z);
             x = newX; y = newY;
 
             newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p11 = new Point3D(newX, newY, z);
+            Point3DWithTexture p11 = new Point3DWithTexture(newX, newY, z);
 
             z += val;
-            Point3D p12 = new Point3D(0, 0, z);
+            Point3DWithTexture p12 = new Point3DWithTexture(0, 0, z);
 
             Line3D l1 = new Line3D(p1, p4);
             Line3D l2 = new Line3D(p4, p5);
@@ -313,179 +507,179 @@ namespace AffineTransformations3D
             double h = Math.Sqrt(t * t - t * t / 4);
             double h2 = Math.Sqrt(scale * scale - t * t / 4);
             double val = Math.Sqrt(h * h - h2 * h2);
-            Point3D p1 = new Point3D(0, 0, 0);
+            Point3DWithTexture p1 = new Point3DWithTexture(0, 0, 0);
             double z = val;
 
-            Point3D p2 = new Point3D(-scale, 0, z);
+            Point3DWithTexture p2 = new Point3DWithTexture(-scale, 0, z);
             double rad = (Math.PI / 180) * 72;
             double x = -scale;
             double y = 0.0;
             double newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             double newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p3 = new Point3D(newX, newY, z);
+            Point3DWithTexture p3 = new Point3DWithTexture(newX, newY, z);
             x = newX; y = newY;
 
             newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p4 = new Point3D(newX, newY, z);
+            Point3DWithTexture p4 = new Point3DWithTexture(newX, newY, z);
             x = newX; y = newY;
 
             newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p5 = new Point3D(newX, newY, z);
+            Point3DWithTexture p5 = new Point3DWithTexture(newX, newY, z);
             x = newX; y = newY;
 
             newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p6 = new Point3D(newX, newY, z);
+            Point3DWithTexture p6 = new Point3DWithTexture(newX, newY, z);
 
             z += h;
-            Point3D p7 = new Point3D(scale, 0, z);
+            Point3DWithTexture p7 = new Point3DWithTexture(scale, 0, z);
             x = scale;
             y = 0.0;
             newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p8 = new Point3D(newX, newY, z);
+            Point3DWithTexture p8 = new Point3DWithTexture(newX, newY, z);
             x = newX; y = newY;
 
             newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p9 = new Point3D(newX, newY, z);
+            Point3DWithTexture p9 = new Point3DWithTexture(newX, newY, z);
             x = newX; y = newY;
 
             newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p10 = new Point3D(newX, newY, z);
+            Point3DWithTexture p10 = new Point3DWithTexture(newX, newY, z);
             x = newX; y = newY;
 
             newX = x * Math.Cos(rad) - y * Math.Sin(rad);
             newY = x * Math.Sin(rad) + y * Math.Cos(rad);
-            Point3D p11 = new Point3D(newX, newY, z);
+            Point3DWithTexture p11 = new Point3DWithTexture(newX, newY, z);
 
             z += val;
-            Point3D p12 = new Point3D(0, 0, z);
+            Point3DWithTexture p12 = new Point3DWithTexture(0, 0, z);
 
             Line3D l1 = new Line3D(p1, p5);
             Line3D l2 = new Line3D(p5, p4);
             Line3D l3 = new Line3D(p4, p1);
             Polygon3D side1 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d1 = TriangleCenter(side1);
+            Point3DWithTexture d1 = TriangleCenter(side1);
 
             l1 = new Line3D(p1, p5);
             l2 = new Line3D(p5, p6);
             l3 = new Line3D(p6, p1);
             Polygon3D side2 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d2 = TriangleCenter(side2);
+            Point3DWithTexture d2 = TriangleCenter(side2);
 
             l1 = new Line3D(p1, p6);
             l2 = new Line3D(p6, p2);
             l3 = new Line3D(p2, p1);
             Polygon3D side3 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d3 = TriangleCenter(side3);
+            Point3DWithTexture d3 = TriangleCenter(side3);
 
             l1 = new Line3D(p1, p2);
             l2 = new Line3D(p2, p3);
             l3 = new Line3D(p3, p1);
             Polygon3D side4 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d4 = TriangleCenter(side4);
+            Point3DWithTexture d4 = TriangleCenter(side4);
 
             l1 = new Line3D(p1, p3);
             l2 = new Line3D(p3, p4);
             l3 = new Line3D(p4, p1);
             Polygon3D side5 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d5 = TriangleCenter(side5);
+            Point3DWithTexture d5 = TriangleCenter(side5);
 
 
             l1 = new Line3D(p7, p4);
             l2 = new Line3D(p4, p5);
             l3 = new Line3D(p5, p7);
             Polygon3D side6 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d6 = TriangleCenter(side6);
+            Point3DWithTexture d6 = TriangleCenter(side6);
 
             l1 = new Line3D(p7, p8);
             l2 = new Line3D(p8, p5);
             l3 = new Line3D(p5, p7);
             Polygon3D side7 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d7 = TriangleCenter(side7);
+            Point3DWithTexture d7 = TriangleCenter(side7);
 
             l1 = new Line3D(p8, p5);
             l2 = new Line3D(p5, p6);
             l3 = new Line3D(p6, p8);
             Polygon3D side8 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d8 = TriangleCenter(side8);
+            Point3DWithTexture d8 = TriangleCenter(side8);
 
             l1 = new Line3D(p8, p9);
             l2 = new Line3D(p9, p6);
             l3 = new Line3D(p6, p8);
             Polygon3D side9 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d9 = TriangleCenter(side9);
+            Point3DWithTexture d9 = TriangleCenter(side9);
 
             l1 = new Line3D(p9, p2);
             l2 = new Line3D(p2, p6);
             l3 = new Line3D(p6, p9);
             Polygon3D side10 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d10 = TriangleCenter(side10);
+            Point3DWithTexture d10 = TriangleCenter(side10);
 
             l1 = new Line3D(p9, p10);
             l2 = new Line3D(p10, p2);
             l3 = new Line3D(p2, p9);
             Polygon3D side11 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d11 = TriangleCenter(side11);
+            Point3DWithTexture d11 = TriangleCenter(side11);
 
             l1 = new Line3D(p10, p2);
             l2 = new Line3D(p2, p3);
             l3 = new Line3D(p3, p10);
             Polygon3D side12 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d12 = TriangleCenter(side12);
+            Point3DWithTexture d12 = TriangleCenter(side12);
 
             l1 = new Line3D(p10, p11);
             l2 = new Line3D(p11, p3);
             l3 = new Line3D(p3, p10);
             Polygon3D side13 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d13 = TriangleCenter(side13);
+            Point3DWithTexture d13 = TriangleCenter(side13);
 
             l1 = new Line3D(p11, p3);
             l2 = new Line3D(p3, p4);
             l3 = new Line3D(p4, p11);
             Polygon3D side14 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d14 = TriangleCenter(side14);
+            Point3DWithTexture d14 = TriangleCenter(side14);
 
             l1 = new Line3D(p11, p4);
             l2 = new Line3D(p4, p7);
             l3 = new Line3D(p7, p11);
             Polygon3D side15 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d15 = TriangleCenter(side15);
+            Point3DWithTexture d15 = TriangleCenter(side15);
 
 
             l1 = new Line3D(p12, p7);
             l2 = new Line3D(p7, p8);
             l3 = new Line3D(p8, p12);
             Polygon3D side16 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d16 = TriangleCenter(side16);
+            Point3DWithTexture d16 = TriangleCenter(side16);
 
             l1 = new Line3D(p12, p8);
             l2 = new Line3D(p8, p9);
             l3 = new Line3D(p9, p12);
             Polygon3D side17 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d17 = TriangleCenter(side17);
+            Point3DWithTexture d17 = TriangleCenter(side17);
 
             l1 = new Line3D(p12, p9);
             l2 = new Line3D(p9, p10);
             l3 = new Line3D(p10, p12);
             Polygon3D side18 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d18 = TriangleCenter(side18);
+            Point3DWithTexture d18 = TriangleCenter(side18);
 
             l1 = new Line3D(p12, p10);
             l2 = new Line3D(p10, p11);
             l3 = new Line3D(p11, p12);
             Polygon3D side19 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d19 = TriangleCenter(side19);
+            Point3DWithTexture d19 = TriangleCenter(side19);
 
             l1 = new Line3D(p12, p11);
             l2 = new Line3D(p11, p7);
             l3 = new Line3D(p7, p12);
             Polygon3D side20 = new Polygon3D(new List<Line3D> { l1, l2, l3 });
-            Point3D d20 = TriangleCenter(side20);
+            Point3DWithTexture d20 = TriangleCenter(side20);
 
 
             l1 = new Line3D(d1, d2);
@@ -577,7 +771,7 @@ namespace AffineTransformations3D
             return p;
         }
 
-        private static Point3D TriangleCenter(Polygon3D triangle)
+        private static Point3DWithTexture TriangleCenter(Polygon3D triangle)
         {
             Line3D a = triangle.lines[0];
             Line3D b = triangle.lines[1];
@@ -605,7 +799,7 @@ namespace AffineTransformations3D
                 z3 = b.first.z;
             }
 
-            Point3D center = new Point3D((x1 + x2 + x3) / 3, (y1 + y2 + y3) / 3, (z1 + z2 + z3) / 3);
+            Point3DWithTexture center = new Point3DWithTexture((x1 + x2 + x3) / 3, (y1 + y2 + y3) / 3, (z1 + z2 + z3) / 3);
             return center;
         }
     }

@@ -11,24 +11,24 @@ namespace AffineTransformations3D
         {
             return (cos + 1) / 2;
         }
-        private static double ModelLambert(Point3D point, Point3D normal, Point3D light)
+        private static double ModelLambert(Point3DWithTexture point, Point3DWithTexture normal, Point3DWithTexture light)
         {
-            Point3D rayLight = new Point3D(point.x - light.x, point.y - light.y, point.z - light.z);
+            Point3DWithTexture rayLight = new Point3DWithTexture(point.x - light.x, point.y - light.y, point.z - light.z);
             double cos = GraphMath3D.CosDist(rayLight, normal);
             return ConvertCosToBrightness(cos);
         }
 
-        private static Dictionary<Point3D, Point3D> CalculateNormal2Points(Polyhedron3D polyhedron)
+        private static Dictionary<Point3DWithTexture, Point3DWithTexture> CalculateNormal2Points(Polyhedron3D polyhedron)
         {
             var points2polygons = GraphMath3D.PolyhedronToPoints(polyhedron);
-            Dictionary<Point3D, Point3D> pointsNormals = new Dictionary<Point3D, Point3D>();
-            List<Point3D> normals = new List<Point3D>();
+            Dictionary<Point3DWithTexture, Point3DWithTexture> pointsNormals = new Dictionary<Point3DWithTexture, Point3DWithTexture>();
+            List<Point3DWithTexture> normals = new List<Point3DWithTexture>();
             for (int i = 0; i < polyhedron.polygons.Count; i++)
                 normals.Add(GraphMath3D.CalculateNormal(polyhedron.polygons[i]));
             
             foreach(var item in points2polygons)
             {
-                Point3D point3D = new Point3D(0, 0, 0);
+                Point3DWithTexture point3D = new Point3DWithTexture(0, 0, 0);
                 foreach(var i in item.Value)
                 {
                     point3D.x += normals[i].x;
@@ -43,16 +43,16 @@ namespace AffineTransformations3D
             return pointsNormals;
         }
 
-        private static Dictionary<Point3D, double> Shading(Polyhedron3D polyhedron, Point3D pointLight)
+        private static Dictionary<Point3DWithTexture, double> Shading(Polyhedron3D polyhedron, Point3DWithTexture pointLight)
         {
             var pointsNormals = CalculateNormal2Points(polyhedron);
-            Dictionary<Point3D, double> points2Lights = new Dictionary<Point3D, double>();
+            Dictionary<Point3DWithTexture, double> points2Lights = new Dictionary<Point3DWithTexture, double>();
             foreach (var item in pointsNormals)
                 points2Lights[item.Key] = ModelLambert(item.Key, item.Value, pointLight);
             return points2Lights;
         }
 
-        public static Bitmap Gourand(Polyhedron3D polyhedron, int width, int height, Point3D pointLight, Color color)
+        public static Bitmap Gourand(Polyhedron3D polyhedron, int width, int height, Point3DWithTexture pointLight, Color color)
         {
             var points2Lights = Shading(polyhedron, pointLight);
             Bitmap bitmap = new Bitmap(width, height);

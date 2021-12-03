@@ -9,32 +9,32 @@ namespace AffineTransformations3D
 {
     class GraphMath3D
     {
-        public static double ScalarProduct(Point3D left, Point3D right) =>
+        public static double ScalarProduct(Point3DWithTexture left, Point3DWithTexture right) =>
          left.x * right.x + left.y * right.y + left.z * right.z;
 
-        public static double VectorLength(Point3D vector) =>
+        public static double VectorLength(Point3DWithTexture vector) =>
             Math.Sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
 
-        public static double EuclideanDist(Point3D left, Point3D right) =>
+        public static double EuclideanDist(Point3DWithTexture left, Point3DWithTexture right) =>
         Math.Sqrt(Math.Pow(left.x - right.x, 2) + Math.Pow(left.y - right.y, 2));
 
-        public static Point3D CrossProduct(Point3D vector01, Point3D vector02)
+        public static Point3DWithTexture CrossProduct(Point3DWithTexture vector01, Point3DWithTexture vector02)
         {
             var x = vector01.y * vector02.z - vector01.z * vector02.y;
             var y = vector01.z * vector02.x - vector01.x * vector02.z;
             var z = vector01.x * vector02.y - vector01.y * vector02.x;
-            return new Point3D(x, y, z);
+            return new Point3DWithTexture(x, y, z);
         }
 
 
-        public static double CosDist(Point3D left, Point3D right)
+        public static double CosDist(Point3DWithTexture left, Point3DWithTexture right)
         {
             var scalarProduct = ScalarProduct(left, right);
             var lengthProduct = VectorLength(left) * VectorLength(right);
             return scalarProduct / lengthProduct;
         }
 
-        public static Point3D CalculateNormal(Polygon3D polygon)
+        public static Point3DWithTexture CalculateNormal(Polygon3D polygon)
         {
             double ax = polygon.lines[0].second.x - polygon.lines[0].first.x;
             double ay = polygon.lines[0].second.y - polygon.lines[0].first.y;
@@ -47,7 +47,7 @@ namespace AffineTransformations3D
             double nx = ay * bz - az * by;
             double ny = az * bx - ax * bz;
             double nz = ax * by - ay * bx;
-            return new Point3D(nx, ny, nz);
+            return new Point3DWithTexture(nx, ny, nz);
         }
 
         
@@ -165,26 +165,26 @@ namespace AffineTransformations3D
             return Math.Sin(x * x + y * y);
         }
 
-        public static List<List<Point3D>> Triangulate(List<Point3D> polygonPoints)
+        public static List<List<Point3DWithTexture>> Triangulate(List<Point3DWithTexture> polygonPoints)
         {
             if (polygonPoints.Count == 3)
-                return new List<List<Point3D>> { polygonPoints };
-            List<List<Point3D>> trianglePoints = new List<List<Point3D>>();
+                return new List<List<Point3DWithTexture>> { polygonPoints };
+            List<List<Point3DWithTexture>> trianglePoints = new List<List<Point3DWithTexture>>();
             for (int i = 2; i < polygonPoints.Count; i++)
-                trianglePoints.Add(new List<Point3D> { polygonPoints[0], polygonPoints[i - 1], polygonPoints[i] });
+                trianglePoints.Add(new List<Point3DWithTexture> { polygonPoints[0], polygonPoints[i - 1], polygonPoints[i] });
             return trianglePoints;
         }
-        public static List<Point3D> PolygonToPoints(Polygon3D polygon)
+        public static List<Point3DWithTexture> PolygonToPoints(Polygon3D polygon)
         {
-            List<Point3D> resultPoints = new List<Point3D>();
+            List<Point3DWithTexture> resultPoints = new List<Point3DWithTexture>();
             foreach (var line in polygon.lines)
                 resultPoints.Add(line.first);
             return resultPoints;
         }
 
-        public static Dictionary<Point3D, List<int>> PolyhedronToPoints(Polyhedron3D polyhedron)
+        public static Dictionary<Point3DWithTexture, List<int>> PolyhedronToPoints(Polyhedron3D polyhedron)
         {
-            Dictionary<Point3D, List<int>> points2polygons = new Dictionary<Point3D, List<int>>();
+            Dictionary<Point3DWithTexture, List<int>> points2polygons = new Dictionary<Point3DWithTexture, List<int>>();
             for (int i = 0; i < polyhedron.polygons.Count; i++)
             {
                 foreach (var line in polyhedron.polygons[i].lines)
@@ -197,12 +197,12 @@ namespace AffineTransformations3D
             return points2polygons;
 
         }
-        public static List<List<Point3D>> Rasterize(Polyhedron3D polyhedron, int width, int height)
+        public static List<List<Point3DWithTexture>> Rasterize(Polyhedron3D polyhedron, int width, int height)
         {
-            List<List<Point3D>> rasterizedPolyhedron = new List<List<Point3D>>();
+            List<List<Point3DWithTexture>> rasterizedPolyhedron = new List<List<Point3DWithTexture>>();
             foreach (var polygon in polyhedron.polygons)
             {
-                List<Point3D> rasterizedPolygon = new List<Point3D>();
+                List<Point3DWithTexture> rasterizedPolygon = new List<Point3DWithTexture>();
                 var polygonPoints = PolygonToPoints(polygon);
                 var triangles = Triangulate(polygonPoints);
                 foreach (var triangle in triangles)
@@ -213,9 +213,9 @@ namespace AffineTransformations3D
             return rasterizedPolyhedron;
         }
 
-        private static List<Point3D> RasterizeTriangle(List<Point3D> point3Ds, int width, int height)
+        private static List<Point3DWithTexture> RasterizeTriangle(List<Point3DWithTexture> point3Ds, int width, int height)
         {
-            List<Point3D> rasterizedTriangle = new List<Point3D>();
+            List<Point3DWithTexture> rasterizedTriangle = new List<Point3DWithTexture>();
             var triangle = point3Ds.OrderBy(point => point.y).ToList();
 
             var x01s = Interpolate(triangle[0].y, triangle[0].x, triangle[1].y, triangle[1].x);
@@ -244,18 +244,19 @@ namespace AffineTransformations3D
                 int curxL = (int)lX[i], curxR = (int)rX[i];
                 var currZ = Interpolate(curxL, lZ[i], curxR, rZ[i]);
                 for (int x = curxL; x < curxR; x++)
-                    rasterizedTriangle.Add(new Point3D(x, (y0 + i), currZ[x - curxL]));
+                    rasterizedTriangle.Add(new Point3DWithTexture(x, (y0 + i), currZ[x - curxL]));
             }
 
             return rasterizedTriangle;
         }
 
-        public static List<List<Tuple<Point3D, double>>> RasterizeWithLight(Polyhedron3D polyhedron, int width, int height, Dictionary<Point3D, double> points2Lights)
+        public static List<List<Tuple<Point3DWithTexture, double>>> RasterizeWithLight(Polyhedron3D polyhedron, int width, int height, 
+            Dictionary<Point3DWithTexture, double> points2Lights)
         {
-            List<List<Tuple<Point3D, double>>> rasterizedPolyhedron = new List<List<Tuple<Point3D, double>>>();
+            List<List<Tuple<Point3DWithTexture, double>>> rasterizedPolyhedron = new List<List<Tuple<Point3DWithTexture, double>>>();
             foreach (var polygon in polyhedron.polygons)
             {
-                List<Tuple<Point3D, double>> rasterizedPolygon = new List<Tuple<Point3D, double>>();
+                List<Tuple<Point3DWithTexture, double>> rasterizedPolygon = new List<Tuple<Point3DWithTexture, double>>();
                 var polygonPoints = PolygonToPoints(polygon);
                 var triangles = Triangulate(polygonPoints);
                 foreach (var triangle in triangles)
@@ -266,9 +267,10 @@ namespace AffineTransformations3D
             return rasterizedPolyhedron;
         }
 
-        private static List<Tuple<Point3D, double>> RasterizeTriangleWithLight(List<Point3D> point3Ds, int width, int height, Dictionary<Point3D, double> points2Lights)
+        private static List<Tuple<Point3DWithTexture, double>> RasterizeTriangleWithLight(List<Point3DWithTexture> point3Ds, int width, int height,
+            Dictionary<Point3DWithTexture, double> points2Lights)
         {
-            List<Tuple<Point3D, double>> rasterizedTriangle = new List<Tuple<Point3D, double>>();
+            List<Tuple<Point3DWithTexture, double>> rasterizedTriangle = new List<Tuple<Point3DWithTexture, double>>();
             var triangle = point3Ds.OrderBy(point => point.y).ToList();
 
             var x01s = Interpolate(triangle[0].y, triangle[0].x, triangle[1].y, triangle[1].x);
@@ -307,7 +309,7 @@ namespace AffineTransformations3D
                 var currZ = Interpolate(curxL, lZ[i], curxR, rZ[i]);
                 var currH = Interpolate(curxL, lH[i], curxR, rH[i]);
                 for (int x = curxL; x < curxR; x++)
-                    rasterizedTriangle.Add(Tuple.Create(new Point3D(x, y0 + i, currZ[x - curxL]), (double)currH[x -curxL]));
+                    rasterizedTriangle.Add(Tuple.Create(new Point3DWithTexture(x, y0 + i, currZ[x - curxL]), (double)currH[x -curxL]));
             }
 
             return rasterizedTriangle;
@@ -350,11 +352,15 @@ namespace AffineTransformations3D
             return rasterizedPolyhedron;
         }
 
-        private static List<Tuple<Point3D, Tuple<double, double>>> RasterizeTriangleWithTexture(List<Point3D> point3Ds, Bitmap texture)
+        private static List<Tuple<Point3D, Tuple<double, double>>> RasterizeTriangleWithTexture(List<Point3DWithTexture> point3Ds, Bitmap texture)
         {
             List<Tuple<Point3D, Tuple<double, double>>> rasterizedTriangle = 
                 new List<Tuple<Point3D, Tuple<double, double>>>();
             var triangle = point3Ds.OrderBy(point => point.y).ToList();
+
+            double x0 = triangle[0].xTex * (texture.Width - 1); double y0 = triangle[0].yTex * (texture.Height - 1);
+            double x1 = triangle[1].xTex * (texture.Width - 1); double y1 = triangle[1].yTex * (texture.Height - 1);
+            double x2 = triangle[2].xTex * (texture.Width - 1); double y2 = triangle[2].yTex * (texture.Height - 1);
 
             var x01s = Interpolate(triangle[0].y, triangle[0].x, triangle[1].y, triangle[1].x);
             var x12s = Interpolate(triangle[1].y, triangle[1].x, triangle[2].y, triangle[2].x);
@@ -364,44 +370,23 @@ namespace AffineTransformations3D
             var z12s = Interpolate(triangle[1].y, triangle[1].z, triangle[2].y, triangle[2].z);
             var z02s = Interpolate(triangle[0].y, triangle[0].z, triangle[2].y, triangle[2].z);
 
-            var yTarget = Interpolate(triangle[0].y, 0, triangle[2].y, texture.Height - 1);
-
-            double xMin = triangle[0].x;
-            double xMax = triangle[0].x;
-            if (triangle[1].x < xMin)
-                xMin = triangle[1].x;
-            if (triangle[2].x < xMin)
-                xMin = triangle[2].x;
-            if (triangle[1].x > xMax)
-                xMax = triangle[1].x;
-            if (triangle[2].x > xMax)
-                xMax = triangle[2].x;
-
-            double x0 = 0, x1 = 0, x2 = 0;
-            if (triangle[0].x == xMax)
-                x0 = texture.Width - 1;
-            else if (triangle[0].x != xMin && triangle[0].x != xMax)
-                x0 = texture.Width - 1;
-            
-            if (triangle[1].x == xMax)
-                x1 = texture.Width - 1;
-            
-            if (triangle[2].x == xMax)
-                x2 = texture.Width - 1;
-            else if (triangle[2].x != xMin && triangle[2].x != xMax)
-                x2 = texture.Width - 1;
-
             var xTex01s = Interpolate(triangle[0].y, x0, triangle[1].y, x1);
             var xTex12s = Interpolate(triangle[1].y, x1, triangle[2].y, x2);
             var xTex02s = Interpolate(triangle[0].y, x0, triangle[2].y, x2);
 
+            var yTex01s = Interpolate(triangle[0].y, y0, triangle[1].y, y1);
+            var yTex12s = Interpolate(triangle[1].y, y1, triangle[2].y, y2);
+            var yTex02s = Interpolate(triangle[0].y, y0, triangle[2].y, y2);
+
             x01s.RemoveAt(x01s.Count - 1);
             z01s.RemoveAt(z01s.Count - 1);
             xTex01s.RemoveAt(xTex01s.Count - 1);
+            yTex01s.RemoveAt(yTex01s.Count - 1);
 
             var x012s = x01s.Concat(x12s).ToList();
             var z012s = z01s.Concat(z12s).ToList();
             var xTex012s = xTex01s.Concat(xTex12s).ToList();
+            var yTex012s = yTex01s.Concat(yTex12s).ToList();
 
             int middle = x012s.Count / 2;
             List<double> lX = x02s[middle] < x012s[middle] ? x02s : x012s,
@@ -409,19 +394,22 @@ namespace AffineTransformations3D
                       lZ = x02s[middle] < x012s[middle] ? z02s : z012s,
                       rZ = x02s[middle] < x012s[middle] ? z012s : z02s,
                       lXTex = x02s[middle] < x012s[middle] ? xTex02s : xTex012s,
-                      rXTex = x02s[middle] < x012s[middle] ? xTex012s : xTex02s;
+                      rXTex = x02s[middle] < x012s[middle] ? xTex012s : xTex02s,
+                      lYTex = x02s[middle] < x012s[middle] ? yTex02s : yTex012s,
+                      rYTex = x02s[middle] < x012s[middle] ? yTex012s : yTex02s;
 
 
-            int y0 = (int)triangle[0].y, y2 = (int)triangle[2].y;
-            for (int i = 0; i <= y2 - y0; i++)
+            int yFirst = (int)triangle[0].y, yLast = (int)triangle[2].y;
+            for (int i = 0; i <= yLast - yFirst; i++)
             {
                 int curxL = (int)lX[i], curxR = (int)rX[i];
                 var currZ = Interpolate(curxL, lZ[i], curxR, rZ[i]);
-                var currTY = yTarget[i];
                 var currTX = Interpolate(curxL, lXTex[i], curxR, rXTex[i]);
+                var currTY = Interpolate(curxL, lYTex[i], curxR, rYTex[i]);
                 for (int x = curxL; x < curxR; x++)
                 {
-                    rasterizedTriangle.Add(Tuple.Create(new Point3D(x, y0 + i, currZ[x - curxL]), Tuple.Create(currTX[x - curxL], currTY)));
+                    rasterizedTriangle.Add(Tuple.Create(new Point3D(x, yFirst + i, currZ[x - curxL]), 
+                        Tuple.Create(currTX[x - curxL], currTY[x - curxL])));
                 }
             }
 

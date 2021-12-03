@@ -32,23 +32,23 @@ namespace AffineTransformations3D
                 List<Line3D> lines = new List<Line3D>();
                 foreach (Line3D l in p.lines)
                 {
-                    Point3D p1 = l.first;
+                    Point3DWithTexture p1 = l.first;
                     double x = p1.x;
                     double y = p1.y;
                     double z = p1.z;
 
                     double newX = (x - z) * Math.Cos(rad);
                     double newY = y + (x + z) * Math.Sin(rad);
-                    Point3D first = new Point3D(newX, newY, z);
+                    Point3DWithTexture first = new Point3DWithTexture(newX, newY, z, p1.xTex, p1.yTex);
 
-                    Point3D p2 = l.second;
+                    Point3DWithTexture p2 = l.second;
                     x = p2.x;
                     y = p2.y;
                     z = p2.z;
 
                     newX = (x - z) * Math.Cos(rad);
                     newY = y + (x + z) * Math.Sin(rad);
-                    Point3D second = new Point3D(newX, newY, z);
+                    Point3DWithTexture second = new Point3DWithTexture(newX, newY, z, p2.xTex, p2.yTex);
                     Line3D line = new Line3D(first, second);
                     lines.Add(line);
                 }
@@ -67,7 +67,7 @@ namespace AffineTransformations3D
                 List<Line3D> lines = new List<Line3D>();
                 foreach (Line3D l in p.lines)
                 {
-                    Point3D p1 = l.first;
+                    Point3DWithTexture p1 = l.first;
                     double x = p1.x;
                     double y = p1.y;
                     double z = p1.z;
@@ -77,16 +77,16 @@ namespace AffineTransformations3D
 
                     double newX = (k * x) / (z + k);
                     double newY = (k * y) / (z + k);
-                    Point3D first = new Point3D(newX, newY, p1.z);
+                    Point3DWithTexture first = new Point3DWithTexture(newX, newY, p1.z, p1.xTex, p1.yTex);
 
-                    Point3D p2 = l.second;
+                    Point3DWithTexture p2 = l.second;
                     x = p2.x;
                     y = p2.y;
                     z = p2.z;
 
                     newX = (k * x) / (z + k);
                     newY = (k * y) / (z + k);
-                    Point3D second = new Point3D(newX, newY, p2.z);
+                    Point3DWithTexture second = new Point3DWithTexture(newX, newY, p2.z, p2.xTex, p2.yTex);
                     Line3D line = new Line3D(first, second);
                     lines.Add(line);
                 }
@@ -107,12 +107,16 @@ namespace AffineTransformations3D
                     double x = line.first.x;
                     double y = line.first.y;
                     double z = line.first.z;
-                    Point3D first = new Point3D(x, y, z);
+                    double xTex = line.first.xTex;
+                    double yTex = line.first.yTex;
+                    Point3DWithTexture first = new Point3DWithTexture(x, y, z, xTex, yTex);
 
                     x = line.second.x;
                     y = line.second.y;
                     z = line.second.z;
-                    Point3D second = new Point3D(x, y, z);
+                    xTex = line.second.xTex;
+                    yTex = line.second.yTex;
+                    Point3DWithTexture second = new Point3DWithTexture(x, y, z, xTex, yTex);
                     Line3D l = new Line3D(first, second);
                     lines.Add(l);
                 }
@@ -169,12 +173,14 @@ namespace AffineTransformations3D
                                               GraphMath3D.Point3DToMatix(polygons[i].lines[j].first));
                     var secondPointMatrix = GraphMath3D.MatrixMultiplication(transformationMatrix,
                                               GraphMath3D.Point3DToMatix(polygons[i].lines[j].second));
-                    var firstPoint = new Point3D(firstPointMatrix[0, 0] / firstPointMatrix[3, 0],
+                    var firstPoint = new Point3DWithTexture(firstPointMatrix[0, 0] / firstPointMatrix[3, 0],
                                                  firstPointMatrix[1, 0] / firstPointMatrix[3, 0],
-                                                 firstPointMatrix[2, 0] / firstPointMatrix[3, 0]);
-                    var secondPoint = new Point3D(secondPointMatrix[0, 0] / secondPointMatrix[3, 0],
+                                                 firstPointMatrix[2, 0] / firstPointMatrix[3, 0], 
+                                                 polygons[i].lines[j].first.xTex, polygons[i].lines[j].first.yTex);
+                    var secondPoint = new Point3DWithTexture(secondPointMatrix[0, 0] / secondPointMatrix[3, 0],
                                                  secondPointMatrix[1, 0] / secondPointMatrix[3, 0],
-                                                 secondPointMatrix[2, 0] / secondPointMatrix[3, 0]);
+                                                 secondPointMatrix[2, 0] / secondPointMatrix[3, 0], 
+                                                 polygons[i].lines[j].second.xTex, polygons[i].lines[j].second.yTex);
                     polygons[i].lines[j].first = firstPoint;
                     polygons[i].lines[j].second = secondPoint;
                 }
@@ -233,13 +239,13 @@ namespace AffineTransformations3D
         {
             double stepX = (X1 - X0) / countStep, stepY = (Y1 - Y0) / countStep,
                    currentX = X0, currentY = Y0;
-            List<Point3D> points = new List<Point3D>();
+            List<Point3DWithTexture> points = new List<Point3DWithTexture>();
             for (int i = 0; i < countStep; i++)
             {
                 currentX = X0;
                 for (int j = 0; j < countStep; j++)
                 {
-                    points.Add(new Point3D(currentX, currentY, func(currentX, currentY)));
+                    points.Add(new Point3DWithTexture(currentX, currentY, func(currentX, currentY)));
                     currentX += stepX;
                 }
                 currentY += stepY;

@@ -18,7 +18,7 @@ namespace AffineTransformations3D
             for (int i = 0; i < height; i++)
                 for (int j = 0; j < width; j++)
                     buff[i, j] = double.MinValue;
-            List<List<List<Point3D>>> rasterizedPolyhedrons = new List<List<List<Point3D>>>();
+            List<List<List<Point3DWithTexture>>> rasterizedPolyhedrons = new List<List<List<Point3DWithTexture>>>();
             foreach (var polyhedron in polyhedron3Ds)
                 rasterizedPolyhedrons.Add(GraphMath3D.Rasterize(polyhedron, width, height));
 

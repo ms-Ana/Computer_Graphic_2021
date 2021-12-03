@@ -7,6 +7,7 @@ namespace AffineTransformations3D
 {
     class Texture
     {
+
         public static Bitmap GetTexture(Polyhedron3D polyhedron, Bitmap texture, int width, int height)
         {
             Bitmap bitmap = new Bitmap(width, height);
@@ -19,7 +20,7 @@ namespace AffineTransformations3D
                     buff[i, j] = double.MinValue;
 
 
-            var rasterizedPolyhedron = GraphMath3D.RasterizeWithTexture(polyhedron);
+            var rasterizedPolyhedron = GraphMath3D.RasterizeWithTexture(polyhedron, texture);
             double minU = double.MaxValue;
             double maxU = double.MinValue;
             double minV = double.MaxValue;
@@ -66,6 +67,13 @@ namespace AffineTransformations3D
                             double h = texture.Height / 100 * val;
                             if (h == texture.Height)
                                 h--;
+
+                            var values = point.Item2;
+                            w = values.Item1; h = values.Item2;
+                            if (w >= texture.Width)
+                                w = texture.Width - 1;
+                            if (h >= texture.Height)
+                                h = texture.Height - 1;
 
                             int red = texture.GetPixel((int)w, (int)h).R;
                             int green = texture.GetPixel((int)w, (int)h).G;

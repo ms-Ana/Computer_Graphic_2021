@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace AffineTransformations3D
 {
@@ -123,29 +124,6 @@ namespace AffineTransformations3D
 
         public void FixPointsForBitmap()
         {
-            /*if (polygons.Count > 8)
-            {
-                foreach (Polygon3D polygon in polygons)
-                {
-                    foreach (Line3D line in polygon.lines)
-                    {
-                        double x = line.first.x;
-                        double y = line.first.y;
-                        double z = line.first.z;
-                        //line.first.x = -x;
-                        //line.first.y = -y;
-                        //line.first.z = -z;
-
-                        x = line.second.x;
-                        y = line.second.y;
-                        z = line.second.z;
-                        //line.second.x = -x;
-                        //line.second.y = -y;
-                        //line.second.z = -z;
-                    }
-                }
-                return;
-            }*/
             foreach (Polygon3D polygon in polygons)
             {
                 foreach (Line3D line in polygon.lines)

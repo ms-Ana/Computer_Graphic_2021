@@ -107,9 +107,13 @@ namespace AffineTransformations3D
                     break;
                 case 5:
                     p = Polyhedron3D.Graphic(GraphMath3D.SinCos, 30, -100, 100, -100, 100);
+                    g.Clear(SystemColors.Control);
+                    FloatingHorizon.FloatingHorizonAlgorithm(GraphMath3D.SinCos, 30, -100, 100, -100, 100, g, W, H, 3);
                     break;
                 case 6:
-                    p = Polyhedron3D.Graphic(GraphMath3D.Square, 30, -10, 10, -10, 10);
+                    p = Polyhedron3D.Graphic(GraphMath3D.Square, 30, -100, 100, -100, 100);
+                    g.Clear(SystemColors.Control);
+                    FloatingHorizon.FloatingHorizonAlgorithm(GraphMath3D.Square, 30, -100, 100, -100, 100, g, W, H, 1);
                     break;
                 case 7:
                     HideButtons(true);
@@ -828,6 +832,7 @@ namespace AffineTransformations3D
                 picture.Visible = true;
             }
         }
+
     }
 
     public delegate double callable(double x, double y);

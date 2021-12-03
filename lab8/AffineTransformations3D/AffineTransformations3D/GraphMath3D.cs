@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace AffineTransformations3D
 {
@@ -151,12 +152,17 @@ namespace AffineTransformations3D
 
         public static double SinCos(double x, double y)
         {
-            return Math.Sin(x) * Math.Cos(y);
+            return Math.Sin(x) * Math.Cos(y) * 10;
         }
 
         public static double Square(double x, double y)
         {
-            return x * x + y * y;
+            return (x * x + y * y) / 100;
+        }
+
+        public static double FuncView(double x, double y)
+        {
+            return Math.Sin(x * x + y * y);
         }
 
         public static List<List<Point3D>> Triangulate(List<Point3D> polygonPoints)
@@ -326,7 +332,7 @@ namespace AffineTransformations3D
             return result;
         }
 
-        public static List<List<Tuple<Point3D, Tuple<double, double>>>> RasterizeWithTexture(Polyhedron3D polyhedron)
+        public static List<List<Tuple<Point3D, Tuple<double, double>>>> RasterizeWithTexture(Polyhedron3D polyhedron, Bitmap texture)
         {
             List<List<Tuple<Point3D, Tuple<double, double>>>> rasterizedPolyhedron = 
                 new List<List<Tuple<Point3D, Tuple<double, double>>>>();
@@ -337,14 +343,14 @@ namespace AffineTransformations3D
                 var polygonPoints = PolygonToPoints(polygon);
                 var triangles = Triangulate(polygonPoints);
                 foreach (var triangle in triangles)
-                    rasterizedPolygon.AddRange(RasterizeTriangleWithTexture(triangle));
+                    rasterizedPolygon.AddRange(RasterizeTriangleWithTexture(triangle, texture));
                 rasterizedPolyhedron.Add(rasterizedPolygon);
             }
 
             return rasterizedPolyhedron;
         }
 
-        private static List<Tuple<Point3D, Tuple<double, double>>> RasterizeTriangleWithTexture(List<Point3D> point3Ds)
+        private static List<Tuple<Point3D, Tuple<double, double>>> RasterizeTriangleWithTexture(List<Point3D> point3Ds, Bitmap texture)
         {
             List<Tuple<Point3D, Tuple<double, double>>> rasterizedTriangle = 
                 new List<Tuple<Point3D, Tuple<double, double>>>();
@@ -358,35 +364,52 @@ namespace AffineTransformations3D
             var z12s = Interpolate(triangle[1].y, triangle[1].z, triangle[2].y, triangle[2].z);
             var z02s = Interpolate(triangle[0].y, triangle[0].z, triangle[2].y, triangle[2].z);
 
-            /*var u01s = Interpolate(triangle[0].x, 0, triangle[1].x, 1);
-            var u12s = Interpolate(triangle[1].x, 0, triangle[2].x, 1);
-            var u02s = Interpolate(triangle[0].x, 0, triangle[2].x, 1);
+            var yTarget = Interpolate(triangle[0].y, 0, triangle[2].y, texture.Height - 1);
 
-            var v01s = Interpolate(triangle[0].y, 0, triangle[1].y, 1);
-            var v12s = Interpolate(triangle[1].y, 0, triangle[2].y, 1);
-            var v02s = Interpolate(triangle[0].y, 0, triangle[2].y, 1);*/
+            double xMin = triangle[0].x;
+            double xMax = triangle[0].x;
+            if (triangle[1].x < xMin)
+                xMin = triangle[1].x;
+            if (triangle[2].x < xMin)
+                xMin = triangle[2].x;
+            if (triangle[1].x > xMax)
+                xMax = triangle[1].x;
+            if (triangle[2].x > xMax)
+                xMax = triangle[2].x;
+
+            double x0 = 0, x1 = 0, x2 = 0;
+            if (triangle[0].x == xMax)
+                x0 = texture.Width - 1;
+            else if (triangle[0].x != xMin && triangle[0].x != xMax)
+                x0 = texture.Width - 1;
+            
+            if (triangle[1].x == xMax)
+                x1 = texture.Width - 1;
+            
+            if (triangle[2].x == xMax)
+                x2 = texture.Width - 1;
+            else if (triangle[2].x != xMin && triangle[2].x != xMax)
+                x2 = texture.Width - 1;
+
+            var xTex01s = Interpolate(triangle[0].y, x0, triangle[1].y, x1);
+            var xTex12s = Interpolate(triangle[1].y, x1, triangle[2].y, x2);
+            var xTex02s = Interpolate(triangle[0].y, x0, triangle[2].y, x2);
 
             x01s.RemoveAt(x01s.Count - 1);
             z01s.RemoveAt(z01s.Count - 1);
-            /*if (u01s.Count > 0)
-                u01s.RemoveAt(u01s.Count - 1);
-            if (v01s.Count > 0)
-                v01s.RemoveAt(v01s.Count - 1);*/
+            xTex01s.RemoveAt(xTex01s.Count - 1);
 
             var x012s = x01s.Concat(x12s).ToList();
             var z012s = z01s.Concat(z12s).ToList();
-            /*var u012s = u01s.Concat(u12s).ToList();
-            var v012s = v01s.Concat(v12s).ToList();*/
+            var xTex012s = xTex01s.Concat(xTex12s).ToList();
 
             int middle = x012s.Count / 2;
             List<double> lX = x02s[middle] < x012s[middle] ? x02s : x012s,
                       rX = x02s[middle] < x012s[middle] ? x012s : x02s,
                       lZ = x02s[middle] < x012s[middle] ? z02s : z012s,
-                      rZ = x02s[middle] < x012s[middle] ? z012s : z02s;
-                      /*lU = x02s[middle] < x012s[middle] ? u02s : u012s,
-                      rU = x02s[middle] < x012s[middle] ? u012s : u02s,
-                      lV = x02s[middle] < x012s[middle] ? v02s : v012s,
-                      rV = x02s[middle] < x012s[middle] ? v012s : v02s;*/
+                      rZ = x02s[middle] < x012s[middle] ? z012s : z02s,
+                      lXTex = x02s[middle] < x012s[middle] ? xTex02s : xTex012s,
+                      rXTex = x02s[middle] < x012s[middle] ? xTex012s : xTex02s;
 
 
             int y0 = (int)triangle[0].y, y2 = (int)triangle[2].y;
@@ -394,48 +417,17 @@ namespace AffineTransformations3D
             {
                 int curxL = (int)lX[i], curxR = (int)rX[i];
                 var currZ = Interpolate(curxL, lZ[i], curxR, rZ[i]);
-                /*var currU = Interpolate(curxL, lU[i], curxR, i >= rU.Count ? rU[0] : rU[i]);
-                var currV = Interpolate(curxL, lV[i], curxR, i >= rV.Count ? rV[0] : rV[i]);*/
+                var currTY = yTarget[i];
+                var currTX = Interpolate(curxL, lXTex[i], curxR, rXTex[i]);
                 for (int x = curxL; x < curxR; x++)
                 {
-                    Point3D a = triangle[0];
-                    Point3D e1 = triangle[1] - triangle[0];
-                    Point3D e2 = triangle[2] - triangle[0];
-                    Point3D n = CrossProduct(e1, e2);
-                    Point3D m = CrossProduct(e2, a);
-                    Point3D l = CrossProduct(a, e1);
-                    double deltaL = curxL * n.x + y0 * n.y + n.z;
-                    double uL = curxL * m.x + y0 * m.y + m.z;
-                    double vL = curxL * l.x + y0 * l.y + l.z;
-                    uL /= deltaL; vL /= deltaL;
-                    double deltaR = curxR * n.x + y2 * n.y + n.z;
-                    double uR = curxR * m.x + y2 * m.y + m.z;
-                    double vR = curxR * l.x + y2 * l.y + l.z;
-                    uR /= deltaR; vR /= deltaR;
-                    double curxM = (curxL + curxR) / 2;
-                    double yM = (y0 + y2) / 2;
-                    double deltaM = curxM * n.x + yM * n.y + n.z;
-                    double uM = curxM * m.x + yM * m.y + m.z;
-                    double vM = curxM * l.x + yM * l.y + l.z;
-                    uM /= deltaM; vM /= deltaM;
-
-                    double k = uL + uR - 2 * uM;
-                    double a2 = 2 * k / ((curxR - curxL) * (curxR - curxL));
-                    double a1 = (uR - uL) / (curxR - curxL) - ((2 * k) / ((curxR - curxL) * (curxR - curxL))) * (curxR + curxL);
-                    double a0 = uL - a1 * curxL - a2 * curxL * curxL;
-                    double u = a0 + a1 * x + a2 * x * x;
-
-                    k = vL + vR - 2 * vM;
-                    a2 = 2 * k / ((y2 - y0) * (y2 - y0));
-                    a1 = (vR - vL) / (y2 - y0) - ((2 * k) / ((y2 - y0) * (y2 - y0))) * (y2 + y0);
-                    a0 = vL - a1 * y0 - a2 * y0 * y0;
-                    double v = a0 + a1 * (y0 + i) + a2 * (y0 + i) * (y0 + i);
-
-                    rasterizedTriangle.Add(Tuple.Create(new Point3D(x, y0 + i, currZ[x - curxL]), Tuple.Create(u, v)));
+                    rasterizedTriangle.Add(Tuple.Create(new Point3D(x, y0 + i, currZ[x - curxL]), Tuple.Create(currTX[x - curxL], currTY)));
                 }
             }
 
             return rasterizedTriangle;
         }
+
+
     }
 }

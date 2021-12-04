@@ -16,6 +16,25 @@ namespace AffineTransformations3D
             this.y = y;
             this.z = z;
         }
+        public override bool Equals(Object obj)
+        {
+            //Check for null and compare run-time types.
+            if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+            {
+                return false;
+            }
+            else
+            {
+                Point3D p = (Point3D)obj;
+                return (x == p.x) && (y == p.y) && (z == p.z);
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return ((int)x << 2 + (int)z << 2) ^ (int)y;
+        }
+
         public static Point3D operator -(Point3D leftPoint, Point3D rightPoint)
         {
             return new Point3D(leftPoint.x - rightPoint.x,

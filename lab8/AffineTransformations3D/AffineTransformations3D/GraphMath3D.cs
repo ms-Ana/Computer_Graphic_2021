@@ -152,7 +152,7 @@ namespace AffineTransformations3D
 
         public static double SinCos(double x, double y)
         {
-            return Math.Sin(x) * Math.Cos(y) * 10;
+            return Math.Sin(x) * Math.Cos(y);
         }
 
         public static double Square(double x, double y)
@@ -160,9 +160,9 @@ namespace AffineTransformations3D
             return (x * x + y * y) / 100;
         }
 
-        public static double FuncView(double x, double y)
+        public static double FuncView(double x, double z)
         {
-            return Math.Sin(x * x + y * y);
+            return Math.Sin(10 * (x * x + z * z));
         }
 
         public static List<List<Point3DWithTexture>> Triangulate(List<Point3DWithTexture> polygonPoints)

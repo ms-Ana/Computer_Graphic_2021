@@ -33,6 +33,8 @@ namespace AffineTransformations3D
         private Polyhedron3D currentCamera;
         private int cameraAngle;
         private PictureBox picture;
+        private int horizonXAngle;
+        private int horizonYAngle;
 
         public Form1()
         {
@@ -91,6 +93,8 @@ namespace AffineTransformations3D
             int currentPolyhedron = cmb.SelectedIndex;
             Polyhedron3D p = Figures.HexahedronWithTexture(scale);
             HideButtons(false);
+            horizonXAngle = 0; horizonYAngle = 0;
+            KeyDown -= Form1_KeyDownHorizon;
             switch (currentPolyhedron)
             {
                 case 1:
@@ -108,12 +112,14 @@ namespace AffineTransformations3D
                 case 5:
                     p = Polyhedron3D.Graphic(GraphMath3D.SinCos, 30, -100, 100, -100, 100);
                     g.Clear(SystemColors.Control);
-                    FloatingHorizon.FloatingHorizonAlgorithm(GraphMath3D.SinCos, 30, -100, 100, -100, 100, g, W, H, 3);
+                    FloatingHorizon.FloatingHorizonAlgorithm(GraphMath3D.SinCos, 30, -10, 10, -10, 10, g, W, H, 10, horizonXAngle, horizonYAngle);
+                    KeyDown += Form1_KeyDownHorizon;
                     break;
                 case 6:
-                    p = Polyhedron3D.Graphic(GraphMath3D.Square, 30, -100, 100, -100, 100);
+                    p = Polyhedron3D.Graphic(GraphMath3D.Square, 50, -100, 100, -100, 100);
                     g.Clear(SystemColors.Control);
-                    FloatingHorizon.FloatingHorizonAlgorithm(GraphMath3D.Square, 30, -100, 100, -100, 100, g, W, H, 1);
+                    FloatingHorizon.FloatingHorizonAlgorithm(GraphMath3D.Square, 50, -100, 100, -100, 100, g, W, H, 1, horizonXAngle, horizonYAngle);
+                    KeyDown += Form1_KeyDownHorizon;
                     break;
                 case 7:
                     HideButtons(true);
@@ -830,6 +836,47 @@ namespace AffineTransformations3D
                 Bitmap bitmap = Texture.GetTexture(polyhedron.Axonometric(), texture, 400, 400);
                 picture.Image = bitmap;
                 picture.Visible = true;
+            }
+        }
+
+
+        // Floating Horizon
+
+        private void Form1_KeyDownHorizon(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Up)
+            {
+                horizonXAngle += 10;
+            }
+            else if (e.KeyCode == Keys.Down)
+            {
+                horizonXAngle -= 10;
+            }
+            else if (e.KeyCode == Keys.Right)
+            {
+                horizonYAngle += 10;
+            }
+            else if (e.KeyCode == Keys.Left)
+            {
+                horizonYAngle -= 10;
+            }
+            else
+            {
+                return;
+            }
+
+            g.Clear(SystemColors.Control);
+            int curr = comboBox1.SelectedIndex;
+            switch (curr)
+            {
+                case 5:
+                    FloatingHorizon.FloatingHorizonAlgorithm(GraphMath3D.SinCos, 30, -10, 10, -10, 10, g, W, H, 10, horizonXAngle, horizonYAngle);
+                    break;
+                case 6:
+                    FloatingHorizon.FloatingHorizonAlgorithm(GraphMath3D.Square, 50, -100, 100, -100, 100, g, W, H, 1, horizonXAngle, horizonYAngle);
+                    break;
+                default:
+                    break;
             }
         }
 

@@ -3,51 +3,162 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 
 namespace AffineTransformations3D
 {
     class FloatingHorizon
     {
-        public static void FloatingHorizonAlgorithm(callable func, int countStep, double X0, double X1, double Z0, double Z1,
-             Graphics g, int W, int H, int scale)
+
+        public static void FHAlg(callable func, int countStep, double x0, double x1, double z0, double z1,
+             Graphics g, int W, int H, int scale, double xAngle, double yAngle)
         {
+            if (x1 < x0)
+            {
+                double temp = x1;
+                x1 = x0;
+                x0 = temp;
+            }
+            if (z1 < z0)
+            {
+                double temp = z1;
+                z1 = z0;
+                z0 = temp;
+            }
+            double stepX = (x1 - x0) / countStep, stepZ = (z1 - z0) / countStep,
+                currentX = x0, currentZ = z0;
+
+            Dictionary<double, double> minY = new Dictionary<double, double>(), maxY = new Dictionary<double, double>();
+
+            Pen pen = new Pen(Color.Black);
+            for (currentZ = z0; currentZ <= z1; currentZ += stepZ)
+            {
+                currentX = x0;
+                double prevX = x0;
+                double prevY = func(prevX, currentZ);
+                Point3DWithTexture p = new Point3DWithTexture(prevX, prevY, currentZ);
+                Line3D l = new Line3D(p, p);
+                Polygon3D pol = new Polygon3D(new List<Line3D> { l });
+                Polyhedron3D polyhedron = new Polyhedron3D(new List<Polygon3D> { pol });
+                polyhedron.Rotate(0, yAngle, 0);
+                polyhedron.Rotate(0, 0, xAngle);
+                prevX = polyhedron.polygons[0].lines[0].first.x;
+                prevY = polyhedron.polygons[0].lines[0].first.y;
+                bool prevVisible = true;
+
+                for (int i = 0; i < countStep; i++)
+                {
+                    double y = func(currentX, currentZ);
+                    p = new Point3DWithTexture(currentX, y, currentZ);
+                    l = new Line3D(p, p);
+                    pol = new Polygon3D(new List<Line3D> { l });
+                    polyhedron = new Polyhedron3D(new List<Polygon3D> { pol });
+                    polyhedron.Rotate(0, yAngle, 0);
+                    polyhedron.Rotate(0, 0, xAngle);
+                    double rX = polyhedron.polygons[0].lines[0].first.x;
+                    double rY = polyhedron.polygons[0].lines[0].first.y;
+                    double rZ = polyhedron.polygons[0].lines[0].first.z;
+
+                    int picY = H - (int)rY;
+                    int picX = W + (int)rX;
+                    bool draw;
+                    if (!maxY.ContainsKey(picX) || picY > maxY[picX] || !minY.ContainsKey(picX) || picY < minY[picX])
+                        draw = true;
+                    else
+                        draw = false;
+
+                    if (prevVisible && !maxY.ContainsKey(picX))
+                    {
+                        maxY[picX] = picY;
+                        g.DrawLine(pen, W + (int)prevX * scale, H - (int)prevY * scale, W + (int)rX * scale, H - (int)rY * scale);
+                        
+                    }
+                    else if (prevVisible && picY > maxY[picX])
+                    {
+                        maxY[picX] = picY;
+                        g.DrawLine(pen, W + (int)prevX * scale, H - (int)prevY * scale, W + (int)rX * scale, H - (int)rY * scale);
+                        
+                    }
+
+                    if (prevVisible && !minY.ContainsKey(picX))
+                    {
+                        minY[picX] = picY;
+                        g.DrawLine(pen, W + (int)prevX * scale, H - (int)prevY * scale, W + (int)rX * scale, H - (int)rY * scale);
+                    }
+                    else if (prevVisible && picY < minY[picX])
+                    {
+                        minY[picX] = picY;
+                        g.DrawLine(pen, W + (int)prevX * scale, H - (int)prevY * scale, W + (int)rX * scale, H - (int)rY * scale);
+                    }
+
+                    prevVisible = draw;
+
+                    prevX = rX; prevY = rY;
+                    currentX += stepX;
+                }
+
+                //Thread.Sleep(200);
+            }
+
+        }
+
+
+
+        public static void FloatingHorizonAlgorithm(callable func, int countStep, double x0, double x1, double z0, double z1,
+             Graphics g, int W, int H, int scale, double xAngle, double yAngle)
+        {
+            if (x1 < x0)
+            {
+                double temp = x1;
+                x1 = x0;
+                x0 = temp;
+            }
+            if (z1 < z0)
+            {
+                double temp = z1;
+                z1 = z0;
+                z0 = temp;
+            }
             int wScreen = W * 2 - 1;
             int hScreen = H * 2 - 1;
-            double stepX = (X1 - X0) / countStep, stepZ = (Z1 - Z0) / countStep,
-                currentX = X0, currentZ = Z0;
-            double location = -100;
-            double Xmin = X0, Xmax = X1, Zmin = Z0, Zmax = Z1;
+            double stepX = (x1 - x0) / countStep, stepZ = (z1 - z0) / countStep,
+                currentX = x0, currentZ = z0;
+            double Xmin = x0, Xmax = x1, Zmin = z0, Zmax = z1;
             int tFlag = 0, pFlag = 0;
             Pen pen = new Pen(Color.Black);
             double xi = 0, yi = 0;
 
             double xLeft = -1, yLeft = -1, xRight = -1, yRight = -1;
             Dictionary<double, double> Up = new Dictionary<double, double>(), Down = new Dictionary<double, double>();
-            for (int i = 0; i < countStep; i++)
-            {
-                Up.Add(currentX, 0);
-                Down.Add(currentX, hScreen);
-                currentX += stepX;
-            }
 
-            List<double> pointsZ = new List<double>();
-            for (int i = 0; i < countStep; i++)
+            for (int i = 0; i <= countStep; i++)
             {
-                pointsZ.Add(currentZ);
-                currentZ += stepZ;
-            }
-            pointsZ = pointsZ.OrderBy(point => Math.Abs(location - point)).ToList();
-
-            for (int i = pointsZ.Count - 1; i >= 0; i--)
-            {
-                currentZ = pointsZ[i];
+                currentZ = z0 + stepZ * i;
                 double xPrev = Xmin;
                 double yPrev = func(Xmin, currentZ);
+                Point3DWithTexture p = new Point3DWithTexture(xPrev, yPrev, currentZ);
+                Line3D l = new Line3D(p, p);
+                Polygon3D pol = new Polygon3D(new List<Line3D> { l });
+                Polyhedron3D polyhedron = new Polyhedron3D(new List<Polygon3D> { pol });
+                polyhedron.Rotate(0, yAngle, 0);
+                polyhedron.Rotate(0, 0, xAngle);
+                xPrev = polyhedron.polygons[0].lines[0].first.x;
+                yPrev = polyhedron.polygons[0].lines[0].first.y;
+
                 Edge(xPrev, yPrev, ref xLeft, ref yLeft, ref Up, ref Down);
                 Visibility(xPrev, yPrev, 0, hScreen, Up, Down, ref tFlag);
                 for (currentX = Xmin; currentX <= Xmax; currentX += stepX)
                 {
                     double y = func(currentX, currentZ);
+                    p = new Point3DWithTexture(currentX, y, currentZ);
+                    l = new Line3D(p, p);
+                    pol = new Polygon3D(new List<Line3D> { l });
+                    polyhedron = new Polyhedron3D(new List<Polygon3D> { pol });
+                    polyhedron.Rotate(0, yAngle, 0);
+                    polyhedron.Rotate(0, 0, xAngle);
+                    currentX = polyhedron.polygons[0].lines[0].first.x;
+                    y = polyhedron.polygons[0].lines[0].first.y;
+
                     Visibility(currentX, y, 0, hScreen, Up, Down, ref tFlag);
                     if (tFlag == pFlag)
                     {
@@ -308,7 +419,7 @@ namespace AffineTransformations3D
             if (x2 - x1 == 0)
             {
                 xi = x2;
-                yi = Arr[x2];
+                yi = Arr.ContainsKey(x2) ? Arr[x2] : def;
             }
             else
             {

@@ -217,6 +217,11 @@ namespace AffineTransformations3D
             ApplyTransformation(GraphMath3D.TranslationMatrix(center.x, center.y, center.z));
         }
 
+        public void Rotate(double angleX, double angleY, double angleZ)
+        {
+            ApplyTransformation(GraphMath3D.RotationMatrix(angleX, angleY, angleZ));
+        }
+
         public void RotateLine(double angle, Line3D line)
         {
             var centerVector = line.second - line.first;

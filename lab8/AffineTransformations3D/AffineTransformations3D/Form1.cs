@@ -813,7 +813,7 @@ namespace AffineTransformations3D
         private void buttonGourand_Click(object sender, EventArgs e)
         {
             //Point3D light = new Point3D(-Math.Sqrt(8), 3, -Math.Sqrt(8));
-            Point3DWithTexture light = new Point3DWithTexture(0, 400, 0);
+            Point3D light = new Point3D(0, 0, -400);
             Polyhedron3D polyhedron = current.Copy();
             polyhedron.FixPointsForBitmap();
             Bitmap bitmap = GouraudShading.Gourand(polyhedron.Axonometric(), 400, 400, light, Color.Gray);
